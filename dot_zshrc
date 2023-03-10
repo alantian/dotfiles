@@ -1,7 +1,18 @@
 # --- .zshrc ---
 
+# - Global stuff
+export PATH=$HOME/.local/bin:$PATH
+export EDITOR=vim
+
+# - Homebrew stuff (if any)
+if [ -d "${HOME}/homebrew/" ]; then
+  export PATH=$HOME/homebrew/bin:$PATH
+  export LD_LIBRARY_PATH=$HOME/homebrew/lib:$LD_LIBRARY_PATH
+fi
+
 # - zsh behaviour
 
+bindkey -A emacs main # use emacs keybinding
 
 # plugins, managed by zplug <https://github.com/zplug/zplug>
 source ~/.zplug/init.zsh
@@ -10,7 +21,9 @@ source ~/.zplug/init.zsh
 zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-autosuggestions"
-zplug "spaceship-prompt/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
+zplug "modules/git", from:prezto
+zplug "modules/utility", from:prezto
+#zplug "spaceship-prompt/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -23,17 +36,10 @@ fi
 # Then, source plugins and add commands to $PATH
 zplug load
 
-bindkey -A emacs main # use emacs keybinding
 
-# - Global stuff
-export PATH=$HOME/.local/bin:$PATH
-export EDITOR=vim
+# - oh-my-posh
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/onehalf.minimal.omp.json)"
 
-# - Homebrew stuff (if any)
-if [ -d "${HOME}/homebrew/" ]; then
-  export PATH=$HOME/homebrew/bin:$PATH
-  export LD_LIBRARY_PATH=$HOME/homebrew/lib:$LD_LIBRARY_PATH
-fi
 
 # - Conda alias
 export CONDA_ROOT="${HOME}/conda"
