@@ -1,22 +1,47 @@
 # --- .zshrc ---
 
-# Global stuff
+# - zsh behaviour
+
+
+# plugins, managed by zplug <https://github.com/zplug/zplug>
+source ~/.zplug/init.zsh
+
+# Plugins. Make sure to use double quotes
+zplug "zsh-users/zsh-history-substring-search"
+zplug "zsh-users/zsh-syntax-highlighting"
+zplug "zsh-users/zsh-autosuggestions"
+zplug "spaceship-prompt/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
+
+# Install plugins if there are plugins that have not been installed
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# Then, source plugins and add commands to $PATH
+zplug load
+
+bindkey -A emacs main # use emacs keybinding
+
+# - Global stuff
 export PATH=$HOME/.local/bin:$PATH
 export EDITOR=vim
 
-# Homebrew stuff (if any)
+# - Homebrew stuff (if any)
 if [ -d "${HOME}/homebrew/" ]; then
   export PATH=$HOME/homebrew/bin:$PATH
   export LD_LIBRARY_PATH=$HOME/homebrew/lib:$LD_LIBRARY_PATH
 fi
 
-# Conda alias
+# - Conda alias
 export CONDA_ROOT="${HOME}/conda"
 alias ci='source "${CONDA_ROOT}/etc/profile.d/conda.sh"'
 alias ca='conda activate'
 alias cda='conda deactivate'
 
-# gcloud alias
+# - gcloud alias
 alias gssh='gcloud compute ssh'
 alias gscp='gcloud compute scp'
 
