@@ -1,11 +1,11 @@
-# Display time
-SPACESHIP_TIME_SHOW=true
-
 # Display username always
 SPACESHIP_USER_SHOW=always
 
 # Do not truncate path in repos
 SPACESHIP_DIR_TRUNC_REPO=false
+
+# Do not add a newline character before each prompt line
+SPACESHIP_PROMPT_ADD_NEWLINE=false
 
 SPACESHIP_PROMPT_ORDER=(
   user
