@@ -1,0 +1,25 @@
+# --- .zshrc ---
+
+# Global stuff
+export PATH=$HOME/.local/bin:$PATH
+export EDITOR=vim
+
+# Homebrew stuff (if any)
+if [ -d "${HOME}/homebrew/" ]; then
+  export PATH=$HOME/homebrew/bin:$PATH
+  export LD_LIBRARY_PATH=$HOME/homebrew/lib:$LD_LIBRARY_PATH
+fi
+
+# Conda alias
+export CONDA_ROOT="${HOME}/conda"
+alias ci='source "${CONDA_ROOT}/etc/profile.d/conda.sh"'
+alias ca='conda activate'
+alias cda='conda deactivate'
+
+# gcloud alias
+alias gssh='gcloud compute ssh'
+alias gscp='gcloud compute scp'
+
+# --- Load .zshrc that's local to this machine ---
+if [ -f ~/.zshrc.local ]; then . ~/.zshrc.local ; fi
+
