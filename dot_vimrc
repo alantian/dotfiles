@@ -1,0 +1,53 @@
+"----------------------------
+" Generic Stuffs and configs
+"----------------------------
+
+set nocompatible  " If .vimrc file exists, vim will start in nocompatible mode. But still set it here anywaya
+filetype off
+
+set tabstop=2     " tabs are at proper location
+set expandtab     " don't use actual tab character (ctrl-v)
+set shiftwidth=2  " indenting is 4 spaces
+set autoindent    " turns it on
+set smartindent   " does the right thing (mostly) in programs
+set paste         " stops indenting with pasting -- should be enabled only when pasting
+set nu            " shows line number
+set mouse=a       " allows mouse clicks to change cursor position
+syntax on         " turns on syntax highlighting
+
+"--------
+" Vundle
+"--------
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+" plugins go blow
+Plugin 'scrooloose/nerdtree'
+Plugin 'nathangrigg/vim-beancount'
+" Plugins go above
+call vundle#end()
+filetype plugin on
+" -- Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+" 
+" -- Quickly adding plugins:
+" :source %         - 
+" :PluginInstall
+"
+" see :h vundle for more details or wiki for FAQ
+"
+" -- Install  from commad line
+" vim +PluginInstall +qall # install from command line.
+
+" Put your non-Plugin stuff after this line
+
+"-------------------
+" load .vimrc.local
+"-------------------
+
+if filereadable(expand('~/.vimrc.local'))
+  source ~/.vimrc.local
+endif
