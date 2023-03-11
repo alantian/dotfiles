@@ -24,7 +24,7 @@ if [ `uname` = "Linux" ]; then
     fi
     echo -e "${bold}Install packages using pacman${normal}"
     sudo pacman -Syu --noconfirm --needed \
-      zsh git \
+      zsh git unzip \
       `#replacements for standard tools` \
       grep ripgrep `# grep` \
       exa `# ls` \
