@@ -40,6 +40,8 @@ zplug load
 # - oh-my-posh
 eval "$(oh-my-posh init zsh --config ~/.poshthemes/onehalf.minimal.omp.json)"
 
+# thefuck
+eval $(thefuck --alias)
 
 # - Conda alias
 export CONDA_ROOT="${HOME}/conda"
