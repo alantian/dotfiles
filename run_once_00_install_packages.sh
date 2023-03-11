@@ -14,7 +14,7 @@ if [ `uname` = "Linux" ]; then
   if [ -f /etc/arch-release ] ; then # Arch linux
     echo -e "${bold}Arch Linux detected${normal}"
     echo -e "${bold}Run \`pacman -Syu\`${normal}"
-    sudo pacman -Syu
+    sudo pacman -Syu --noconfirm
     echo -e "${bold}Install yay for AUR${normal} if it's not installed"
     if [ ! -f /usr/bin/yay ] ; then
       (sudo pacman -Syu --noconfirm --needed git base-devel &&\
