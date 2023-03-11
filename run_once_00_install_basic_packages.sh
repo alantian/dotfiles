@@ -30,6 +30,17 @@ if [ `uname` = "Linux" ]; then
     info "Change shell to zsh"
     sudo chsh -s /usr/bin/zsh $(whoami)
     info "Done"
+  elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
+    info "Debian-baed Linux detected"
+    info "Run \`apt-get update\`"
+    sudo apt-get update
+    info "Install packages using apt-get"
+    sudo sudo apt-get install -y \
+      zsh git unzip \
+    ;
+    info "Change shell to zsh"
+    sudo chsh -s /usr/bin/zsh $(whoami)
+    info "Done"
   fi
 else
   warning "WARNING: cannot determine the OS."
