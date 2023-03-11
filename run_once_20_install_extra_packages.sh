@@ -32,7 +32,6 @@ if [ `uname` = "Linux" ]; then
     fi
     info "Install packages using yay"
     yay -Syu --noconfirm --needed \
-      zsh git unzip \
       `#replacements for standard tools` \
       grep ripgrep `# grep` \
       exa `# ls` \
@@ -61,6 +60,47 @@ if [ `uname` = "Linux" ]; then
       ctop `# top for containers` \
       thefuck `# autocorrect command line errors` \
     ;
+  elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
+    info "Debian-baed Linux detected"
+    info "Run \`apt-get update\`"
+    sudo apt-get update
+    info "Install packages using apt-get"
+    # many packages avaiable for Arch are missing here (especially for debian)..
+    sudo sudo apt-get install -y \
+      ripgrep \
+      bat \
+      fd-find \
+      fzf \
+      entr \
+      tig \
+      ctop \
+      thefuck \
+    ;
+    # some manual install
+    info "Manually install packages"
+    ( 
+      # btop
+      if [ ! -f /usr/local/bin/btop ]; then
+        cd /tmp ;
+        rm -rf btop-x86_64-linux-musl
+        wget https://github.com/aristocratos/btop/releases/download/v1.2.13/btop-x86_64-linux-musl.tbz \
+          -O btop-x86_64-linux-musl.tbz
+        tar xvf btop-x86_64-linux-musl.tbz
+        cd btop
+        sudo make install
+        sudo make setuid
+        cd /tmp
+        rm -rf btop-x86_64-linux-musl
+      fi
+    )
+    # some fixes
+    info "Apply fix"
+    mkdir -p ~/.local/bin
+    ln -s /usr/bin/batcat ~/.local/bin/bat
+
+    info "Change shell to zsh"
+    sudo chsh -s /usr/bin/zsh $(whoami)
+    info "Done"
   fi
 else
   warning "WARNING: cannot determine the OS."
