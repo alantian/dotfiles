@@ -36,7 +36,7 @@ if [ `uname` = "Linux" ]; then
     sudo apt-get update
     info "Install packages using apt-get"
     sudo sudo apt-get install -y \
-      zsh git unzip \
+      zsh git unzip wget curl \
     ;
     info "Change shell to zsh"
     sudo chsh -s /usr/bin/zsh $(whoami)
