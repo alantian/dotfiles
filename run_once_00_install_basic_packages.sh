@@ -25,7 +25,7 @@ if [ `uname` = "Linux" ]; then
     sudo pacman -Syu --noconfirm
     info "Install packages using pacman"
     sudo pacman -Syu --noconfirm --needed \
-      zsh git unzip \
+      zsh git unzip wget curl tar bzip2 \
     ;
     info "Change shell to zsh"
     sudo chsh -s /usr/bin/zsh $(whoami)
@@ -36,7 +36,7 @@ if [ `uname` = "Linux" ]; then
     sudo apt-get update
     info "Install packages using apt-get"
     sudo sudo apt-get install -y \
-      zsh git unzip wget curl \
+      zsh git unzip wget curl bzip2 \
     ;
     info "Change shell to zsh"
     sudo chsh -s /usr/bin/zsh $(whoami)
