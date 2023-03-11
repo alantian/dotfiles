@@ -25,6 +25,7 @@ if [ `uname` = "Linux" ]; then
     echo -e "${bold}Install packages using pacman${normal}"
     sudo pacman -Syu --noconfirm --needed \
       zsh git \
+      `#replacements for standard tools` \
       grep ripgrep `# grep` \
       exa `# ls` \
       bat `# cat` \
@@ -37,6 +38,16 @@ if [ `uname` = "Linux" ]; then
       difftastic `# df` \
       plocate `# locate` \
       hexyl `# hexdump` \
+      `# new inventions` \
+      zoxide `# tools to make it easier to find files / change directories`\
+      broot `#file manager` \
+      direnv `#load environment variables depending on the current directory` \
+      fzf `#fuzzy finder` \
+      croc `# send files from one computer to another` \
+      hyperfine `#benchmarking` \
+      xh `# make HTTP requests` \
+      entr `# run arbitrary commands when files change` \
+      tig lazygit `# interactive interfaces for git` \
     ;
     echo -e "${bold}Install packages using yay${normal}"
     yay -Syu --noconfirm --needed \
