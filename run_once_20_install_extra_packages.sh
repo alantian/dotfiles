@@ -10,10 +10,18 @@ NC='\033[0m' # No Color
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+function info() {
+    echo -e "${bold}$*${normal}"
+}
+
+function warning() {
+    echo -e "${RED}${bold}$*${normal}${NC}" 
+}
+
 if [ `uname` = "Linux" ]; then
   if [ -f /etc/arch-release ] ; then # Arch linux
-    echo -e "${bold}Arch Linux detected${normal}"
-    echo -e "${bold}Install yay for AUR${normal} if it's not installed"
+    info "Arch Linux detected"
+    info "Install yay for AUR if it's not installed"
     if [ ! -f /usr/bin/yay ] ; then
       (
         sudo pacman -Syu --noconfirm --needed git base-devel &&\
@@ -22,7 +30,7 @@ if [ `uname` = "Linux" ]; then
         cd yay && makepkg -si --noconfirm && cd /tmp && rm -rf yay ;
       )
     fi
-    echo -e "${bold}Install packages using yay${normal}"
+    info "Install packages using yay"
     yay -Syu --noconfirm --needed \
       zsh git unzip \
       `#replacements for standard tools` \
@@ -55,5 +63,5 @@ if [ `uname` = "Linux" ]; then
     ;
   fi
 else
-  echo -e "${RED}WARNING: cannot determine the OS.${NC}"
+  warning "WARNING: cannot determine the OS."
 fi

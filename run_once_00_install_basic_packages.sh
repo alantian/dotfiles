@@ -10,18 +10,27 @@ NC='\033[0m' # No Color
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+function info() {
+    echo -e "${bold}$*${normal}"
+}
+
+function warning() {
+    echo -e "${RED}${bold}$*${normal}${NC}" 
+}
+
 if [ `uname` = "Linux" ]; then
   if [ -f /etc/arch-release ] ; then # Arch linux
-    echo -e "${bold}Arch Linux detected${normal}"
-    echo -e "${bold}Run \`pacman -Syu\`${normal}"
+    info "Arch Linux detected"
+    info "Run \`pacman -Syu\`"
     sudo pacman -Syu --noconfirm
-    echo -e "${bold}Install packages using pacman${normal}"
+    info "Install packages using pacman"
     sudo pacman -Syu --noconfirm --needed \
       zsh git unzip \
     ;
-    echo -e "${bold}Change shell to zsh${normal}"
+    info "Change shell to zsh"
     sudo chsh -s /usr/bin/zsh $(whoami)
+    info "Done"
   fi
 else
-  echo -e "${RED}${bold}WARNING: cannot determine the OS.${normal}${NC}"
+  warning "WARNING: cannot determine the OS."
 fi
