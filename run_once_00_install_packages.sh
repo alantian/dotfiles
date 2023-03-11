@@ -40,19 +40,22 @@ if [ `uname` = "Linux" ]; then
       hexyl `# hexdump` \
       `# new inventions` \
       zoxide `# tools to make it easier to find files / change directories`\
-      broot `#file manager` \
-      direnv `#load environment variables depending on the current directory` \
-      fzf `#fuzzy finder` \
+      broot `# file manager` \
+      direnv `# load environment variables depending on the current directory` \
+      fzf `# fuzzy finder` \
       croc `# send files from one computer to another` \
       hyperfine `#benchmarking` \
       xh `# make HTTP requests` \
       entr `# run arbitrary commands when files change` \
       tig lazygit `# interactive interfaces for git` \
+      ctop `# top for containers` \
+      thefuck `# autocorrect command line errors` \
     ;
     echo -e "${bold}Install packages using yay${normal}"
     yay -Syu --noconfirm --needed \
       zenith `# top` \
       nodejs-tldr `#man, sort of` \
+      lazydocker `#interactive interface for docker` \
     ;
     echo -e "${bold}Change shell to zsh${normal}"
     sudo chsh -s /usr/bin/zsh $(whoami)
