@@ -6,6 +6,7 @@ if [ `uname` = "Darwin" ]; then
   brew install jandedobbeleer/oh-my-posh/oh-my-posh
   ln -s $(brew --prefix oh-my-posh)/themes ~/.poshthemes
 elif [ `uname` = "Linux" ]; then
+	mkdir -p ~/.local/bin
 	wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O ~/.local/bin/oh-my-posh
 	chmod +x ~/.local/bin/oh-my-posh
 
