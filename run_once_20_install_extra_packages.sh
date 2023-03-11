@@ -65,7 +65,7 @@ if [ `uname` = "Linux" ]; then
     info "Debian-baed Linux detected"
     info "Run \`apt-get update\`"
     sudo apt-get update
-    info "Install packages using apt-get"
+    info "Install packages"
     # many packages avaiable for Arch are missing here (especially for debian)..
     sudo sudo apt-get install -y \
       build-essential \
@@ -78,8 +78,10 @@ if [ `uname` = "Linux" ]; then
       ctop \
       thefuck \
     ;
+    sudo apt-get install exa || warning "exa failed to install"
+    sudo apt-get install duf || warning "exa failed to install"
+
     # some manual install
-    info "Manually install packages"
     ( 
       # btop
       if [ ! -f /usr/local/bin/btop ]; then
@@ -96,7 +98,6 @@ if [ `uname` = "Linux" ]; then
       fi
     )
     # some fixes
-    info "Apply fix"
     mkdir -p ~/.local/bin
     ln -s /usr/bin/batcat ~/.local/bin/bat
 
@@ -105,5 +106,5 @@ if [ `uname` = "Linux" ]; then
     info "Done"
   fi
 else
-  warning "WARNING: cannot determine the OS."
+  warning "cannot determine the OS. Skip."
 fi
