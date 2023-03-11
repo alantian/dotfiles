@@ -32,6 +32,7 @@ if [ `uname` = "Linux" ]; then
     fi
     info "Install packages using yay"
     yay -Syu --noconfirm --needed \
+      base-devel \
       `#replacements for standard tools` \
       grep ripgrep `# grep` \
       exa `# ls` \
@@ -67,6 +68,7 @@ if [ `uname` = "Linux" ]; then
     info "Install packages using apt-get"
     # many packages avaiable for Arch are missing here (especially for debian)..
     sudo sudo apt-get install -y \
+      build-essentials \
       ripgrep \
       bat \
       fd-find \
