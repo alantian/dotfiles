@@ -105,6 +105,38 @@ if [ `uname` = "Linux" ]; then
     sudo chsh -s /usr/bin/zsh $(whoami)
     info "Done"
   fi
+elif [ `uname` = "Darwin" ]; then # macOS
+  info "Mac OS detected"
+
+  info "Install packages using homebrew"
+  brew install \
+      grep ripgrep `# grep` \
+      exa `# ls` \
+      bat `# cat` \
+      git-delta `# a pager for git` \
+      fd `# find` \
+      duf `# df` \
+      dust `# du` \
+      bottom `#btop #(need gcc...)` glances gtop zenith `# top` \
+      sd `# sed` \
+      difftastic `# df` \
+      `#plocate #no equivalent`  `# locate` \
+      hexyl `# hexdump` \
+      `# new inventions` \
+      zoxide `# tools to make it easier to find files / change directories`\
+      broot `# file manager` \
+      direnv `# load environment variables depending on the current directory` \
+      fzf `# fuzzy finder` \
+      croc `# send files from one computer to another` \
+      hyperfine `#benchmarking` \
+      tldr `#man, sort of` \
+      xh `# make HTTP requests` \
+      entr `# run arbitrary commands when files change` \
+      tig lazygit `# interactive interfaces for git` \
+      lazydocker `#interactive interface for docker` \
+      ctop `# top for containers` \
+      thefuck `# autocorrect command line errors` \
+  ;
 else
   warning "cannot determine the OS. Skip."
 fi
