@@ -5,7 +5,8 @@
 #  - https://ohmyposh.dev/docs/installation/linux
 
 if [ `uname` = "Darwin" ]; then
-  brew install jandedobbeleer/oh-my-posh/oh-my-posh
+  brew install --build-from-source jandedobbeleer/oh-my-posh/oh-my-posh 
+  # ^ build from source to prevent binary issues on earlier version of Mac OS.
   ln -s $(brew --prefix oh-my-posh)/themes ~/.poshthemes
 elif [ `uname` = "Linux" ]; then
   if [ ! -f ~/.local/bin/oh-my-posh ]; then
