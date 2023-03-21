@@ -79,7 +79,7 @@ if [ `uname` = "Linux" ]; then
       thefuck \
     ;
     sudo apt-get install exa || warning "exa failed to install"
-    sudo apt-get install duf || warning "exa failed to install"
+    sudo apt-get install duf || warning "duf failed to install"
 
     # some manual install
     ( 
