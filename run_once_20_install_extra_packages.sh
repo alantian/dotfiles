@@ -67,7 +67,7 @@ if [ `uname` = "Linux" ]; then
     sudo apt-get update
     info "Install packages"
     # many packages avaiable for Arch are missing here (especially for debian)..
-    sudo sudo apt-get install -y \
+    sudo apt-get install -y \
       build-essential \
       ripgrep \
       bat \
