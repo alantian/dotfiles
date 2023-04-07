@@ -51,6 +51,10 @@ alias cda='conda deactivate'
 alias gssh='gcloud compute ssh'
 alias gscp='gcloud compute scp'
 
+# - history
+SAVEHIST=1000000
+HISTFILE=~/.zsh_history
+
 # --- Load .zshrc that's local to this machine ---
 if [ -f ~/.zshrc.local ]; then . ~/.zshrc.local ; fi
 
