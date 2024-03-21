@@ -9,16 +9,14 @@ if [ `uname` = "Darwin" ]; then
   # ^ build from source to prevent binary issues on earlier version of Mac OS.
   ln -s $(brew --prefix oh-my-posh)/themes ~/.poshthemes
 elif [ `uname` = "Linux" ]; then
-	mkdir -p ~/.local/bin
-	wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O ~/.local/bin/oh-my-posh
-	chmod +x ~/.local/bin/oh-my-posh
+  mkdir -p ~/.local/bin
+  wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O ~/.local/bin/oh-my-posh -q
+  chmod +x ~/.local/bin/oh-my-posh
 
-	rm -rf ~/.poshthemes
-	mkdir -p ~/.poshthemes
-	wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/themes.zip -O ~/.poshthemes/themes.zip
-	unzip ~/.poshthemes/themes.zip -d ~/.poshthemes
-	chmod u+rw ~/.poshthemes/*.omp.*
-	rm ~/.poshthemes/themes.zip
+  rm -rf ~/.poshthemes
+  mkdir -p ~/.poshthemes
+  wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/themes.zip -O ~/.poshthemes/themes.zip -q
+  unzip -qq ~/.poshthemes/themes.zip -d ~/.poshthemes
+  chmod u+rw ~/.poshthemes/*.omp.*
+  rm ~/.poshthemes/themes.zip
 fi
-
-
