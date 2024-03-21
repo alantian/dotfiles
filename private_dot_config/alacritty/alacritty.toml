@@ -6,6 +6,7 @@ import = [
 
 [window]
 opacity = 1.0
+dimensions = { columns = 80, lines = 40 }
 
 [scrolling]
 history = 100000
@@ -18,3 +19,8 @@ style = { shape = "Block", blinking = "On" }
 
 [mouse]
 hide_when_typing = false
+
+[keyboard]
+bindings = [
+	{key = "N", mods = "Control | Shift", action = "SpawnNewInstance"}
+]
