@@ -1,0 +1,11 @@
+# - Conda alias
+export CONDA_ROOT="${HOME}/conda"
+alias ci='source "${CONDA_ROOT}/etc/profile.d/conda.sh"'
+alias ca='conda activate'
+alias cda='conda deactivate'
+
+# - gcloud alias
+alias gssh='gcloud compute ssh'
+alias gscp='gcloud compute scp'
+
+

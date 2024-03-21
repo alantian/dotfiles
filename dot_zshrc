@@ -34,26 +34,18 @@ fi
 # Then, source plugins and add commands to $PATH
 zplug load
 
-
 # - oh-my-posh
 eval "$(oh-my-posh init zsh --config ~/.poshthemes/onehalf.minimal.omp.json)"
 
 # thefuck
 (( $+commands[thefuck] )) && eval $(thefuck --alias)
 
-# - Conda alias
-export CONDA_ROOT="${HOME}/conda"
-alias ci='source "${CONDA_ROOT}/etc/profile.d/conda.sh"'
-alias ca='conda activate'
-alias cda='conda deactivate'
-
-# - gcloud alias
-alias gssh='gcloud compute ssh'
-alias gscp='gcloud compute scp'
-
 # - history
 SAVEHIST=1000000
 HISTFILE=~/.zsh_history
+
+# cargo (rust), if exists
+if [ -f "$HOME/.cargo/env" ]; then . "$HOME/.cargo/env" ; fi
 
 # --- Load .zshrc that's local to this machine ---
 if [ -f ~/.zshrc.local ]; then . ~/.zshrc.local ; fi
