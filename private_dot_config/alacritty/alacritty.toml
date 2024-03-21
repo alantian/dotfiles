@@ -22,5 +22,6 @@ hide_when_typing = false
 
 [keyboard]
 bindings = [
-	{key = "N", mods = "Control | Shift", action = "SpawnNewInstance"}
+	{key = "N", mods = "Control | Shift", action = "CreateNewWindow"},
+	{key = "F", mods = "Control | Shift", action = "ToggleFullscreen"},
 ]
