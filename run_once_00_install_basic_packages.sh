@@ -43,14 +43,7 @@ if [ `uname` = "Linux" ]; then
     info "Done"
   fi
 elif [ `uname` = "Darwin" ]; then # macOS
-  info "Mac OS detected"
-  info "Install packages using homebrew"
-  brew install \
-    zsh git unzip wget curl bzip2 \
-  ;
-  info "Change shell to zsh"
-  sudo dscl . -create /Users/$USER UserShell $(brew --prefix)/bin/zsh 
-  # Can be later confirmed with `dscl . -read /Users/$USER UserShell`
+  warning "WARNING: Mac OS detectd, but not supported."
 else
   warning "WARNING: cannot determine the OS."
 fi
