@@ -100,7 +100,7 @@ if [ `uname` = "Linux" ]; then
     ;
   elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
     info "Debian-baed Linux detected"
-    apt_install sh git unzip wget curl bzip2
+    apt_install zsh git unzip wget curl bzip2
     sudo chsh -s /usr/bin/zsh $(whoami)
     # many packages avaiable for Arch are missing here (especially for debian)..
     apt_install \
