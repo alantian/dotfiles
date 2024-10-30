@@ -45,7 +45,7 @@ function yay_install() {
       )
     fi
     validate_dependency yay
-    yay -Syu --noconfirm "$@"
+    yay -Syu --noconfirm --needed "$@"
 }
 
 function linux_install_btop_x64() {
