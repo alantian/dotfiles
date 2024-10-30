@@ -63,6 +63,10 @@ function linux_install_btop_x64() {
     fi
 }
 
+function vim_setup_plugins() {
+  vim +PluginInstall +qall
+}
+
 if [ `uname` = "Linux" ]; then
   if [ -f /etc/arch-release ] ; then # Arch linux
     info "Arch Linux detected"
@@ -99,6 +103,7 @@ if [ `uname` = "Linux" ]; then
       ctop `# top for containers` \
       thefuck `# autocorrect command line errors` \
     ;
+    vim_setup_plugins
   elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
     info "Debian-baed Linux detected"
     apt_install zsh git unzip wget curl bzip2
@@ -126,6 +131,9 @@ if [ `uname` = "Linux" ]; then
     # some fixes
     mkdir -p ~/.local/bin
     ln -s /usr/bin/batcat ~/.local/bin/bat
+
+    #.
+    vim_setup_plugins
   fi
 elif [ `uname` = "Darwin" ]; then # macOS
   info "macOS detected"

@@ -4,3 +4,4 @@
 .zplug/log/**
 .zplug/repos/**
 .zplug/zcompdump/**
+.vim/bundle/**

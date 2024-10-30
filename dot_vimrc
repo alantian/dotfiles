@@ -22,8 +22,14 @@ set wrap          " turns on wrapping
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
-" plugins go blow
+" Plugins go blow
+" VundleVim will trigger git clone for each configured repository to ~/.vim/bundle/
+Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-surround'
 Plugin 'scrooloose/nerdtree'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'kien/ctrlp.vim'
 Plugin 'nathangrigg/vim-beancount'
 " Plugins go above
 call vundle#end()
@@ -44,6 +50,14 @@ filetype plugin on
 " vim +PluginInstall +qall # install from command line.
 
 " Put your non-Plugin stuff after this line
+
+
+" Plugin-specific configuraitons
+" - vim-airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
 "-------------------
 " load .vimrc.local

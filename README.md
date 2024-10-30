@@ -10,6 +10,8 @@ Refer:
 ~/
  .zshrc        # main zshrc
  .zshrc_local  # machine specific zshrc, sourced by ~/.zshrc. NOT managed.
+ .vimrc        # main vimrc
+ .vimrc_local  # ditto.
  .local/
        bin/    # scripts, binaries, or symlinks to them. should be in $PATH.
  opt/          # packages.
