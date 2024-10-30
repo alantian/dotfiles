@@ -1,0 +1,11 @@
+[".vim/bundle/Vundle.vim"]
+    type = "archive"
+    url = "https://github.com/VundleVim/Vundle.vim/archive/refs/tags/v0.10.2.tar.gz"
+    exact = true
+    stripComponents = 1
+
+[".zplug"]
+    type = "archive"
+    url = "https://github.com/zplug/zplug/archive/refs/tags/2.4.2.tar.gz"
+    exact = true
+    stripComponents = 1
