@@ -14,14 +14,25 @@ fi
 
 bindkey -A emacs main # use emacs keybinding
 
-# plugins, managed by zplug <https://github.com/zplug/zplug>
+# Plugins are managed by zplug <https://github.com/zplug/zplug>
 source ~/.zplug/init.zsh
 
 # Plugins. Make sure to use double quotes
+# For more plugins, see 
+#   - <https://github.com/unixorn/awesome-zsh-plugins>
+#   - <https://github.com/zsh-users>
+
+
 zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-completions"  # Need extra packages, see https://github.com/zsh-users/zsh-completions?tab=readme-ov-file#using-packages
+zplug "zsh-users/zsh-history-substring-search"
+zplug "chrissicool/zsh-256color"
 zplug "modules/git", from:prezto
+zplug "modules/rsync", from:prezto
+zplug 'dracula/zsh', as:theme
+zplug "egorlem/ultima.zsh-theme", as:theme
 
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
@@ -34,8 +45,20 @@ fi
 # Then, source plugins and add commands to $PATH
 zplug load
 
+# Plugin-specific configurations
+
+# - "zsh-users/zsh-history-substring-search"
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
+HISTORY_SUBSTRING_SEARCH_FUZZY=1
+
 # - oh-my-posh
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/onehalf.minimal.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/lambdageneration.omp.json)"
 
 # thefuck
 (( $+commands[thefuck] )) && eval $(thefuck --alias)

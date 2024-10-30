@@ -70,6 +70,7 @@ if [ `uname` = "Linux" ]; then
     sudo chsh -s /usr/bin/zsh $(whoami)
     yay_install \
       base-devel \
+      zsh-completions `# for zsh-users/zsh-completions` \
       `#replacements for standard tools` \
       grep ripgrep `# grep` \
       exa `# ls` \
@@ -105,6 +106,7 @@ if [ `uname` = "Linux" ]; then
     # many packages avaiable for Arch are missing here (especially for debian)..
     apt_install \
       build-essential \
+      `#replacements for standard tools` \
       ripgrep \
       bat \
       fd-find \

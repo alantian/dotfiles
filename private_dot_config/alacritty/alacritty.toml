@@ -13,6 +13,9 @@ history = 100000
 
 [font]
 size = 13.0
+normal = { family = "MesloLGL Nerd Font Mono", style="Regular" }
+bold = { style="Bold" }
+italic = { style="Italic" }
 
 [cursor]
 style = { shape = "Block", blinking = "On" }
