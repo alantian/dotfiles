@@ -1,27 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # References:
 #  - https://unix.stackexchange.com/questions/46081/identifying-the-system-package-manager
 #  - https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
+#  - https://ohmyposh.dev/install.sh
 
-
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-bold=$(tput bold)
-normal=$(tput sgr0)
-
-function info() {
-    echo -e "${bold}$*${normal}"
+error() {
+    printf "\e[31m$1\e[0m\n"
+    exit 1
 }
 
-function warning() {
-    echo -e "${RED}${bold}$*${normal}${NC}" 
+info() {
+    printf "$1\n"
 }
 
-if [ `uname` = "Linux" ]; then
-  if [ -f /etc/arch-release ] ; then # Arch linux
-    info "Arch Linux detected"
-    info "Install yay for AUR if it's not installed"
+warn() {
+    printf "⚠️  \e[33m$1\e[0m\n"
+}
+
+validate_dependency() {
+    if ! command -v $1 >/dev/null; then
+        error "$1 is required. Please install $1 and try again.\n"
+    fi
+}
+
+function brew_install() {
+    validate_dependency brew
+    brew install -q "$@"
+}
+
+function apt_install() {
+    validate_dependency apt-get
+    sudo apt-get update
+    sudo apt-get install -y "$@"
+}
+
+function yay_install() {
     if [ ! -f /usr/bin/yay ] ; then
       (
         sudo pacman -Syu --noconfirm --needed git base-devel &&\
@@ -30,8 +44,31 @@ if [ `uname` = "Linux" ]; then
         cd yay && makepkg -si --noconfirm && cd /tmp && rm -rf yay ;
       )
     fi
-    info "Install packages using yay"
-    yay -Syu --noconfirm --needed \
+    validate_dependency yay
+    yay -Syu --noconfirm "$@"
+}
+
+function linux_install_btop_x64() {
+    if [ ! -f /usr/local/bin/btop ]; then
+        cd /tmp ;
+        rm -rf btop-x86_64-linux-musl
+        wget https://github.com/aristocratos/btop/releases/download/v1.2.13/btop-x86_64-linux-musl.tbz \
+            -O btop-x86_64-linux-musl.tbz
+        tar xvf btop-x86_64-linux-musl.tbz
+        cd btop
+        sudo make install
+        sudo make setuid
+        cd /tmp
+        rm -rf btop-x86_64-linux-musl
+    fi
+}
+
+if [ `uname` = "Linux" ]; then
+  if [ -f /etc/arch-release ] ; then # Arch linux
+    info "Arch Linux detected"
+    yay_install zsh git unzip wget curl tar bzip2
+    sudo chsh -s /usr/bin/zsh $(whoami)
+    yay_install \
       base-devel \
       `#replacements for standard tools` \
       grep ripgrep `# grep` \
@@ -63,11 +100,10 @@ if [ `uname` = "Linux" ]; then
     ;
   elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
     info "Debian-baed Linux detected"
-    info "Run \`apt-get update\`"
-    sudo apt-get update
-    info "Install packages"
+    apt_install sh git unzip wget curl bzip2
+    sudo chsh -s /usr/bin/zsh $(whoami)
     # many packages avaiable for Arch are missing here (especially for debian)..
-    sudo apt-get install -y \
+    apt_install \
       build-essential \
       ripgrep \
       bat \
@@ -77,36 +113,22 @@ if [ `uname` = "Linux" ]; then
       tig \
       thefuck \
     ;
-    sudo apt-get install ctop || warning "ctop failed to install"
-    sudo apt-get install exa || warning "exa failed to install"
-    sudo apt-get install duf || warning "duf failed to install"
 
-    # some manual install
-    ( 
-      # btop
-      if [ ! -f /usr/local/bin/btop ]; then
-        cd /tmp ;
-        rm -rf btop-x86_64-linux-musl
-        wget https://github.com/aristocratos/btop/releases/download/v1.2.13/btop-x86_64-linux-musl.tbz \
-          -O btop-x86_64-linux-musl.tbz
-        tar xvf btop-x86_64-linux-musl.tbz
-        cd btop
-        sudo make install
-        sudo make setuid
-        cd /tmp
-        rm -rf btop-x86_64-linux-musl
-      fi
-    )
+    # fix blow.
+    sudo apt-get install ctop || warn "ctop failed to install"
+    sudo apt-get install exa || warn "exa failed to install"
+    sudo apt-get install duf || warn "duf failed to install"
+
+    linux_install_btop_x64
+    
     # some fixes
     mkdir -p ~/.local/bin
     ln -s /usr/bin/batcat ~/.local/bin/bat
-
-    info "Change shell to zsh"
-    sudo chsh -s /usr/bin/zsh $(whoami)
-    info "Done"
   fi
 elif [ `uname` = "Darwin" ]; then # macOS
-  warning "WARNING: Mac OS detectd, but not supported."
+  info "macOS detected"
+  brew_install zsh git unzip wget curl bzip2
+  # no need to change shell to zsh as it's already default.
 else
-  warning "WARNING: cannot determine the OS."
+  error "WARNING: cannot determine the OS."
 fi

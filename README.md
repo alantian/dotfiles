@@ -19,12 +19,14 @@ Refer:
 
 ## Daily Operations
 
+See <https://www.chezmoi.io/user-guide/daily-operations/>.
 
 ## One-off Operations 
 
-### Install / Upgrade
+See <https://www.chezmoi.io/user-guide/setup/>.
 
 ```
+# Install
 sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- init --apply git@github.com:alantian/dotfiles.git
 ```
 

@@ -1,2 +1,6 @@
 .config/alacritty/themes/.git/**
 .config/alacritty/themes/images/**
+.zplug/cache/**
+.zplug/log/**
+.zplug/repos/**
+.zplug/zcompdump/**
