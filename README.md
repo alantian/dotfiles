@@ -12,7 +12,7 @@ Refer:
 ~/
  .zshrc        # Main zshrc
  .zshrc_local  # Machine specific zshrc, sourced by ~/.zshrc. NOT managed.
- .profile_common  # profiles that are sourced by both zsh and bash.
+ .commonrc     # profiles that are sourced by both zsh and bash.
  .vimrc        # Main vimrc
  .vimrc_local  # Machine specific vimrc, sourced by ~/.vimrc. NOT managed.
  .local/
@@ -30,7 +30,9 @@ Refer:
 
 Reference:
   - zsh configuration files: <https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout>
-  - bash configuration files: <https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile>
+  - bash configuration files: 
+  -  <https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files>
+  -  <https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile>
 
 ## Daily Operations
 

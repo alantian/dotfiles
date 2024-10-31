@@ -1,8 +1,7 @@
 # --- .zshrc ---
 
 # - Global stuff
-export PATH=$HOME/.local/bin:$PATH
-export EDITOR=vim
+source "${HOME}/.commonrc"
 
 # - Homebrew stuff (if any)
 if [ -d "${HOME}/homebrew/" ]; then
