@@ -38,14 +38,14 @@ function apt_install() {
 function yay_install() {
     if [ ! -f /usr/bin/yay ] ; then
       (
-        sudo pacman -Syu --noconfirm --needed git base-devel &&\
-        cd /tmp&&\
-        git clone https://aur.archlinux.org/yay.git &&\
+        sudo pacman -Syu --noconfirm --needed -q git base-devel && \
+        cd /tmp && \
+        git clone https://aur.archlinux.org/yay.git && \
         cd yay && makepkg -si --noconfirm && cd /tmp && rm -rf yay ;
       )
     fi
     validate_dependency yay
-    yay -Syu --noconfirm --needed "$@"
+    yay -Syu --noconfirm --needed -q "$@" &> /dev/null
 }
 
 function btop_install_linux_x64() {
@@ -70,12 +70,14 @@ function vim_setup_plugins() {
 if [ `uname` = "Linux" ]; then
   if [ -f /etc/arch-release ] ; then # Arch linux
     info "Arch Linux detected"
-    yay_install zsh git unzip wget curl tar bzip2
-    sudo chsh -s /usr/bin/zsh $(whoami)
-    yay_install \
-      base-devel \
-      zsh-completions `# for zsh-users/zsh-completions` \
-      `#replacements for standard tools` \
+    
+    yay_packages=(
+      # standard tools
+      base-devel
+      zsh git unzip wget curl tar bzip2
+      zsh-completions # for zsh-users/zsh-completions
+      #replacements for standard tools
+
       grep ripgrep `# grep` \
       exa `# ls` \
       bat `# cat` \
@@ -102,14 +104,17 @@ if [ `uname` = "Linux" ]; then
       lazydocker `#interactive interface for docker` \
       thefuck `# autocorrect command line errors` \
       ctop `# top for containers` \
-    ;
+
+    )
+    yay_install "${yay_packages[@]}"
+
+    sudo chsh -s /usr/bin/zsh $(whoami)
     vim_setup_plugins
   elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
     info "Debian-based Linux detected"
-    apt_install zsh git unzip wget curl bzip2
-    sudo chsh -s /usr/bin/zsh $(whoami)
-    # many packages avaiable for Arch are missing here (especially for debian)..
-    apt_install \
+
+    apt_packages=(
+      zsh git unzip wget curl bzip2
       vim byobu \
       build-essential \
       `#replacements for standard tools` \
@@ -120,26 +125,18 @@ if [ `uname` = "Linux" ]; then
       entr \
       tig \
       duf \
-    ;
-
-    # fix blow.
-    sudo apt-get install ctop || warn "ctop failed to install"
-    sudo apt-get install exa || warn "exa failed to install"
-    sudo apt-get install duf || warn "duf failed to install"
-
+    )
+    apt_install "${apt_packages[@]}"
     btop_install_linux_x64
-    
-    # some fixes
-    mkdir -p ~/.local/bin
-    # ln -s /usr/bin/batcat ~/.local/bin/bat
 
-    #.
+    sudo chsh -s /usr/bin/zsh $(whoami)
     vim_setup_plugins
   fi
 elif [ `uname` = "Darwin" ]; then # macOS
   info "macOS detected"
   brew_install zsh git unzip wget curl bzip2
   # no need to change shell to zsh as it's already default.
+  vim_setup_plugins
 else
   error "WARNING: cannot determine the OS."
 fi

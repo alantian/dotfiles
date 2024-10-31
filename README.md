@@ -13,9 +13,11 @@ Refer:
  .vimrc        # main vimrc
  .vimrc_local  # ditto.
  .local/
-       bin/    # scripts, binaries, or symlinks to them. should be in $PATH.
- opt/          # packages.
-    conda/     # an example of packages: conda
+   bin/        # scripts, binaries, or symlinks to them. should be in $PATH.
+ opt/          # dir for packages.
+   conda/      # an example of packages: conda. Their files may be symlinked to ~/.local/bin
+   override/   # dir for local packages that may override system-level packages.
+     ffmpeg    # an example of such cpakges
     
 ```
 
