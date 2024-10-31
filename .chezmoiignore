@@ -5,3 +5,4 @@
 .zplug/repos/**
 .zplug/zcompdump/**
 .vim/bundle/**
+README.md
