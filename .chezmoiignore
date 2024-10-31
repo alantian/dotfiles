@@ -4,5 +4,5 @@
 .zplug/log/**
 .zplug/repos/**
 .zplug/zcompdump/**
-.vim/bundle/**
+.vim/bundle/Vundle.vim/doc/tags/**
 README.md
