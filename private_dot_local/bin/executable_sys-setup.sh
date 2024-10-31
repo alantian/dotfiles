@@ -113,7 +113,6 @@ function btop_install_linux_x64() {
 }
 
 function ffmpeg_install_linux_x64_local_static() {
-
   info "ffmpeg: install locally."
 
   URL=https://www.johnvansickle.com/ffmpeg/releases/ffmpeg-7.0.2-amd64-static.tar.xz
