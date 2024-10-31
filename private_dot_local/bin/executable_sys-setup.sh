@@ -31,8 +31,8 @@ function brew_install() {
 
 function apt_install() {
     validate_dependency apt-get
-    sudo apt-get update
-    sudo apt-get install -y "$@"
+    sudo apt-get update -qq
+    sudo apt-get install -qq -y "$@"
 }
 
 function yay_install() {
@@ -48,7 +48,7 @@ function yay_install() {
     yay -Syu --noconfirm --needed "$@"
 }
 
-function linux_install_btop_x64() {
+function btop_install_linux_x64() {
     if [ ! -f /usr/local/bin/btop ]; then
         cd /tmp ;
         rm -rf btop-x86_64-linux-musl
@@ -100,16 +100,17 @@ if [ `uname` = "Linux" ]; then
       entr `# run arbitrary commands when files change` \
       tig lazygit `# interactive interfaces for git` \
       lazydocker `#interactive interface for docker` \
-      ctop `# top for containers` \
       thefuck `# autocorrect command line errors` \
+      ctop `# top for containers` \
     ;
     vim_setup_plugins
   elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
-    info "Debian-baed Linux detected"
+    info "Debian-based Linux detected"
     apt_install zsh git unzip wget curl bzip2
     sudo chsh -s /usr/bin/zsh $(whoami)
     # many packages avaiable for Arch are missing here (especially for debian)..
     apt_install \
+      vim byobu \
       build-essential \
       `#replacements for standard tools` \
       ripgrep \
@@ -118,7 +119,7 @@ if [ `uname` = "Linux" ]; then
       fzf \
       entr \
       tig \
-      thefuck \
+      duf \
     ;
 
     # fix blow.
@@ -126,11 +127,11 @@ if [ `uname` = "Linux" ]; then
     sudo apt-get install exa || warn "exa failed to install"
     sudo apt-get install duf || warn "duf failed to install"
 
-    linux_install_btop_x64
+    btop_install_linux_x64
     
     # some fixes
     mkdir -p ~/.local/bin
-    ln -s /usr/bin/batcat ~/.local/bin/bat
+    # ln -s /usr/bin/batcat ~/.local/bin/bat
 
     #.
     vim_setup_plugins
