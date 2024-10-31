@@ -139,8 +139,40 @@ function ffmpeg_install_linux_x64_local_static() {
     ln -s "${SIMLINK_TARGET}" "${SIMLINK_NAME}"
   )
 
-  info " > Done"
-  info " > Add ${OPT_DIR}/${SIMLINK_NAME} to \$PATH if you need to use"
+  info " > Done. Add ${OPT_DIR}/${SIMLINK_NAME} to \$PATH if you need to use"
+}
+
+function fselect_install_linux_x64_local_static() {
+  info "fselect: install locally."
+
+  URL=https://github.com/jhspetersson/fselect/releases/download/0.8.6/fselect-x86_64-linux-musl.gz
+  # ^ note this is a single gz file. will rename it but add an extra level of dir.
+  ARCHIVE="fselect.gz" # decompressed to "fselect"
+  OPT_DIR="$HOME/opt"
+  STATIC_DIR="$OPT_DIR/static"
+  EXTRACTED_DIR="$STATIC_DIR/fselect-0.8.6-x86_64-linux-musl"
+
+  SIMLINK_NAME="fselect"
+  SIMLINK_TARGET="./static/fselect-0.8.6-x86_64-linux-musl"
+
+  if [ ! -d "${EXTRACTED_DIR}" ]; then
+    (
+      mkdir -p "${STATIC_DIR}"
+      cd "${STATIC_DIR}"
+      mkdir -p "${EXTRACTED_DIR}"
+      cd "${EXTRACTED_DIR}"
+      wget "${URL}" -O "${ARCHIVE}"
+      gzip -d -f "${ARCHIVE}"
+      chmod +x *
+    ) &>/dev/null
+  fi
+  (
+    cd "$OPT_DIR"
+    rm -rf "${SIMLINK_NAME}"
+    ln -s "${SIMLINK_TARGET}" "${SIMLINK_NAME}"
+  )
+
+  info " > Done, Add ${OPT_DIR}/${SIMLINK_NAME} to \$PATH if you need to use"
 }
 
 function vim_install_plugins() {
@@ -194,6 +226,7 @@ function main() {
 
       linux_change_shell_to_zsh
       ffmpeg_install_linux_x64_local_static
+      fselect_install_linux_x64_local_static
       vim_install_plugins
     elif [ -f /etc/debian_version ]; then # Debian/Ubuntu
       info "Debian-based Linux detected"
@@ -216,6 +249,7 @@ function main() {
 
       linux_change_shell_to_zsh
       ffmpeg_install_linux_x64_local_static
+      fselect_install_linux_x64_local_static
       vim_install_plugins
     fi
   elif [ $(uname) = "Darwin" ]; then # macOS
