@@ -1,6 +1,6 @@
 # --- .zshrc ---
 
-# - Global stuff
+# - Common stuff
 source "${HOME}/.commonrc"
 
 # - Homebrew stuff (if any)
