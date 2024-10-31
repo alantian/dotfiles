@@ -63,6 +63,32 @@ function btop_install_linux_x64() {
     fi
 }
 
+function ffmpeg_install_linux_x64_local_static() {
+  URL=https://www.johnvansickle.com/ffmpeg/releases/ffmpeg-7.0.2-amd64-static.tar.xz
+  ARCHIVE="ffmpeg-7.0.2-amd64-static.tar.xz"
+  OPT_DIR="$HOME/opt"
+  STATIC_DIR="$OPT_DIR/static"
+  EXTRACTED_DIR="$STATIC_DIR/ffmpeg-7.0.2-amd64-static"
+
+  SIMLINK_NAME="ffmpeg"
+  SIMLINK_TARGET="./static/ffmpeg-7.0.2-amd64-static"
+
+  if [ ! -d "${EXTRACTED_DIR}" ]; then
+    (
+      mkdir -p "${STATIC_DIR}"
+      cd "${STATIC_DIR}"
+      wget "${URL}" -O "${ARCHIVE}"
+      tar xvf "${ARCHIVE}"
+      rm -rf "${ARCHIVE}"
+    )
+  fi
+  (
+    cd "$OPT_DIR"
+    rm -rf "${SIMLINK_NAME}"
+    ln -s "${SIMLINK_TARGET}" "${SIMLINK_NAME}"
+  )
+}
+
 function vim_setup_plugins() {
   vim +PluginInstall +qall
 }
@@ -104,11 +130,11 @@ if [ `uname` = "Linux" ]; then
       lazydocker `#interactive interface for docker` \
       thefuck `# autocorrect command line errors` \
       ctop `# top for containers` \
-
     )
     yay_install "${yay_packages[@]}"
 
     sudo chsh -s /usr/bin/zsh $(whoami)
+    ffmpeg_install_linux_x64_local_static
     vim_setup_plugins
   elif [ -f /etc/debian_version ] ; then # Debian/Ubuntu
     info "Debian-based Linux detected"
@@ -130,6 +156,7 @@ if [ `uname` = "Linux" ]; then
     btop_install_linux_x64
 
     sudo chsh -s /usr/bin/zsh $(whoami)
+    ffmpeg_install_linux_x64_local_static
     vim_setup_plugins
   fi
 elif [ `uname` = "Darwin" ]; then # macOS
