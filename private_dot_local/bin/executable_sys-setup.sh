@@ -49,6 +49,7 @@ function do_system_wide() {
 }
 
 function brew_install() {
+  info "brew install"
   validate_dependency brew
   brew install -q "$@"
 }
@@ -189,7 +190,21 @@ function main() {
       info "Arch Linux detected"
 
       yay_packages=(
-        # standard tools
+        # Minimal required packages for dotfiles.
+        base-devel
+        zsh git unzip wget curl tar bzip2
+        zsh-completions # for zsh-users/zsh-completions
+        #replacements for standard tools
+      )
+      yay_install "${yay_packages[@]}"
+
+      linux_change_shell_to_zsh
+
+      vim_install_plugins
+
+
+      yay_packages=(
+        # Minimal required packages for dotfiles.
         base-devel
         zsh git unzip wget curl tar bzip2
         zsh-completions # for zsh-users/zsh-completions
@@ -224,10 +239,11 @@ function main() {
       )
       yay_install "${yay_packages[@]}"
 
-      linux_change_shell_to_zsh
+
+
       ffmpeg_install_linux_x64_local_static
       fselect_install_linux_x64_local_static
-      vim_install_plugins
+
     elif [ -f /etc/debian_version ]; then # Debian/Ubuntu
       info "Debian-based Linux detected"
 
@@ -245,12 +261,14 @@ function main() {
         duf
       )
       apt_install "${apt_packages[@]}"
-      btop_install_linux_x64
-
+      
       linux_change_shell_to_zsh
+      vim_install_plugins
+
       ffmpeg_install_linux_x64_local_static
       fselect_install_linux_x64_local_static
-      vim_install_plugins
+      btop_install_linux_x64
+
     fi
   elif [ $(uname) = "Darwin" ]; then # macOS
     info "macOS detected"
