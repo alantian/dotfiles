@@ -57,7 +57,7 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 HISTORY_SUBSTRING_SEARCH_FUZZY=1
 
 # - oh-my-posh
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/catppuccin_latte.omp.json)"
+eval "$(oh-my-posh init zsh --config ${OMP_CONFIG_FILE})"
 
 # thefuck
 (( $+commands[thefuck] )) && eval $(thefuck --alias)
