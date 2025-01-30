@@ -275,6 +275,7 @@ function main() {
     brew_install zsh git unzip wget curl bzip2
     # no need to change shell to zsh as it's already default.
     vim_install_plugins
+    brew_install font-meslo-lg-nerd-font
   else
     error "WARNING: cannot determine the OS."
   fi
