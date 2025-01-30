@@ -189,8 +189,8 @@ function main() {
     if [ -f /etc/arch-release ]; then # Arch linux
       info "Arch Linux detected"
 
+      # Minimal required packages for dotfiles.
       yay_packages=(
-        # Minimal required packages for dotfiles.
         base-devel
         zsh git unzip wget curl tar bzip2
         zsh-completions # for zsh-users/zsh-completions
@@ -202,14 +202,8 @@ function main() {
 
       vim_install_plugins
 
-
-      yay_packages=(
-        # Minimal required packages for dotfiles.
-        base-devel
-        zsh git unzip wget curl tar bzip2
-        zsh-completions # for zsh-users/zsh-completions
-        #replacements for standard tools
-
+      # replacements for standard tools
+      yay_packages=(      
         grep ripgrep `# grep`
         exa `# ls`
         bat `# cat`
@@ -239,8 +233,6 @@ function main() {
       )
       yay_install "${yay_packages[@]}"
 
-
-
       ffmpeg_install_linux_x64_local_static
       fselect_install_linux_x64_local_static
 
@@ -265,17 +257,27 @@ function main() {
       linux_change_shell_to_zsh
       vim_install_plugins
 
+      apt_packages=(
+        `#replacements for standard tools`
+        ripgrep
+        bat
+        fd-find
+        fzf
+        entr
+        tig
+        duf
+      )
+      apt_install "${apt_packages[@]}"
+
       ffmpeg_install_linux_x64_local_static
       fselect_install_linux_x64_local_static
       btop_install_linux_x64
-
     fi
   elif [ $(uname) = "Darwin" ]; then # macOS
     info "macOS detected"
     brew_install zsh git unzip wget curl bzip2
     # no need to change shell to zsh as it's already default.
     vim_install_plugins
-    brew_install font-meslo-lg-nerd-font
   else
     error "WARNING: cannot determine the OS."
   fi
