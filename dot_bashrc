@@ -109,7 +109,7 @@ fi
 # ---------------- END: Adopted from Ubuntu's /etc/skel/.bashrc ------------------------
 
 # - oh-my-posh
-eval "$(oh-my-posh init bash --config ~/.poshthemes/lambdageneration.omp.json)"
+eval "$(oh-my-posh init bash --config ${OMP_CONFIG_FILE})"
 
 [[ ":$PATH:" == *:$HOME/.local/bin:* ]] || PATH="$HOME/.local/bin:$PATH"
 

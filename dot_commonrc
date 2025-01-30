@@ -1,3 +1,4 @@
 export PATH
 [[ ":$PATH:" == *:$HOME/.local/bin:* ]] || PATH="$HOME/.local/bin:$PATH"
 export EDITOR=vim
+export OMP_CONFIG_FILE="$HOME/.poshthemes/catppuccin_latte.omp.json"
