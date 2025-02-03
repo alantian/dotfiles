@@ -69,6 +69,10 @@ HISTFILE=~/.zsh_history
 # cargo (rust), if exists
 if [ -f "$HOME/.cargo/env" ]; then . "$HOME/.cargo/env" ; fi
 
+# proto, if exists. note that shim should come before bin
+if [ -d "$HOME/.proto/bin" ]; then [[ ":$PATH:" == *:$HOME/.proto/bin:* ]] || PATH="$HOME/.proto/bin:$PATH" ; fi
+if [ -d "$HOME/.proto/shims" ]; then [[ ":$PATH:" == *:$HOME/.proto/shims:* ]] || PATH="$HOME/.proto/shims:$PATH" ; fi
+
 # --- Load .zshrc that's local to this machine ---
 if [ -f ~/.zshrc.local ]; then . ~/.zshrc.local ; fi
 
