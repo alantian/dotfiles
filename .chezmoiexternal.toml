@@ -9,9 +9,3 @@
     url = "https://github.com/zplug/zplug/archive/refs/tags/2.4.2.tar.gz"
     exact = true
     stripComponents = 1
-
-["opt/static/ffmpeg-7.0.2-amd64-static"]
-    type = "archive"
-    url = "https://www.johnvansickle.com/ffmpeg/releases/ffmpeg-7.0.2-amd64-static.tar.xz"
-    exact = true
-    stripComponents = 1
