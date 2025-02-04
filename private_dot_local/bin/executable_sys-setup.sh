@@ -40,9 +40,6 @@ function main() {
   if [ $(uname) = "Linux" ] || [ $(uname) = "Darwin" ] ; then
     info "Linux/MacOS detected"
     vim_install_plugins
-    ffmpeg_install_linux_x64_local_static
-    fselect_install_linux_x64_local_static
-
     ~/.local/bin/oh-my-posh-update.sh
   else
     error "WARNING: cannot determine the OS."
