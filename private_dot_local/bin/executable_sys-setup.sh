@@ -41,6 +41,7 @@ function main() {
     info "Linux/MacOS detected"
     vim_install_plugins
     ~/.local/bin/oh-my-posh-update.sh
+    ~/.local/bin/proto-update.sh
   else
     error "WARNING: cannot determine the OS."
   fi

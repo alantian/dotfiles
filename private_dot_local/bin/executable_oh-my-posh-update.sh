@@ -2,8 +2,10 @@
 
 echo "Install/upgrade oh-my-posh"
 
-if [ `uname` = "Linux" ] || [] `uname` = "Darwin" ] ; then
-  curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin -t ~/.poshthemes
+OMP="$HOME/.local/bin/oh-my-posh"
+
+if [ -f $OMP ] ; then
+  $OMP upgrade
 else
-  warning "WARNING: cannot determine the OS."
+  curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin -t ~/.poshthemes
 fi
