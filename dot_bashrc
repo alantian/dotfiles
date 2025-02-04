@@ -6,7 +6,7 @@
 [[ $- != *i* ]] && return
 
 # - Common stuff
-export $(envsubst < ${HOME}.env)
+export $(envsubst < ${HOME}/.env)
 source "${HOME}/.commonrc"
 
 # - Bash behavior
@@ -112,6 +112,6 @@ fi
 # - oh-my-posh
 eval "$(oh-my-posh init bash --config ${OMP_CONFIG_FILE})"
 
-if [ -f ~/.bashrc_local ]; then
-    . ~/.bashrc_local
+if [ -f ~/.bashrc.local ]; then
+    . ~/.bashrc.local
 fi
