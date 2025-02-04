@@ -9,3 +9,11 @@ if [ -f $PROTO ] ; then
 else
   bash <(curl -fsSL https://moonrepo.dev/install/proto.sh) --no-profile --yes
 fi
+
+
+echo "Install/upgrade proto's tools"
+
+$PROTO install python
+$PROTO install node
+$PROTO install pnpm
+$PROTO install ruby
