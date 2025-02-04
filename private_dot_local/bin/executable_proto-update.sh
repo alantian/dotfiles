@@ -16,4 +16,3 @@ echo "Install/upgrade proto's tools"
 $PROTO install python
 $PROTO install node
 $PROTO install pnpm
-$PROTO install ruby
