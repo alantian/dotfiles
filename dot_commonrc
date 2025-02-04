@@ -1,4 +1,30 @@
+# Processing PATH and LD_LIBRARY_PATH. Inspired by /etc/profile
+
+prepend_path () {
+    case ":$PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            PATH="$1${PATH:+:$PATH}"
+    esac
+}
+
+prepend_ld_library_path () {
+    case ":$LD_LIBRARY_PATH:" in
+        *:"$1":*)
+            ;;
+        *)
+            LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    esac
+}
+
+prepend_path "$HOME/.local/bin"
+if [ -d "${HOME}/homebrew/" ]; then
+  prepend_path "$HOME/homebrew/bin"
+  prepend_ld_library_path $HOME/homebrew/lib
+fi
+
 export PATH
-[[ ":$PATH:" == *:$HOME/.local/bin:* ]] || PATH="$HOME/.local/bin:$PATH"
-export EDITOR=vim
-export OMP_CONFIG_FILE="$HOME/.poshthemes/catppuccin_latte.omp.json"
+export LD_LIBRARY_PATH
+
+# vim: set filetype=sh

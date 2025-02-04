@@ -1,13 +1,8 @@
 # --- .zshrc ---
 
 # - Common stuff
+export $(envsubst < ${HOME}/.env)
 source "${HOME}/.commonrc"
-
-# - Homebrew stuff (if any)
-if [ -d "${HOME}/homebrew/" ]; then
-  export PATH=$HOME/homebrew/bin:$PATH
-  export LD_LIBRARY_PATH=$HOME/homebrew/lib:$LD_LIBRARY_PATH
-fi
 
 # - zsh behaviour
 
