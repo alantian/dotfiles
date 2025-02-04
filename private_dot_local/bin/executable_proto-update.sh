@@ -14,5 +14,6 @@ fi
 echo "Install/upgrade proto's tools"
 
 $PROTO install python
+$PROTO install uv
 $PROTO install node
 $PROTO install pnpm
