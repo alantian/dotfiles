@@ -18,10 +18,14 @@ prepend_ld_library_path () {
     esac
 }
 
+# Save path before local addition. 
+# This is helpful for programs disliking locally polluted PATH like yay: An example being 'PATH=$SYS_PATH yay -Syu --noconfirm'
+export SYS_PATH=$PATH
+
 prepend_path "$HOME/.local/bin"
 if [ -d "${HOME}/homebrew/" ]; then
   prepend_path "$HOME/homebrew/bin"
-  prepend_ld_library_path $HOME/homebrew/lib
+  prepend_ld_library_path "$HOME/homebrew/lib"
 fi
 
 prepend_path
