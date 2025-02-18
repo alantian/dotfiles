@@ -101,7 +101,7 @@ function main() {
       # Minimal required packages for dotfiles.
       yay_packages=(
         base-devel
-        zsh git unzip wget curl tar bzip2
+        zsh git unzip wget curl rsync tar bzip2
         zsh-completions # for zsh-users/zsh-completions
         #replacements for standard tools
       )
