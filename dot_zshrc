@@ -61,8 +61,16 @@ eval "$(oh-my-posh init zsh --config ${OMP_CONFIG_FILE})"
 SAVEHIST=1000000
 HISTFILE=~/.zsh_history
 
-# cargo (rust), if exists
+# cargo (rust), if it exists
 if [ -f "$HOME/.cargo/env" ]; then . "$HOME/.cargo/env" ; fi
+
+# uv/uvx shell autocompletion, if it exists
+if type "uv" > /dev/null; then
+  eval "$(uv generate-shell-completion zsh)"
+fi
+if type "uvx" > /dev/null; then
+  eval "$(uvx --generate-shell-completion zsh)"
+fi
 
 # --- Load .zshrc that's local to this machine ---
 if [ -f ~/.zshrc.local ]; then . ~/.zshrc.local ; fi

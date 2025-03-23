@@ -22,6 +22,8 @@ prepend_ld_library_path () {
 # This is helpful for programs disliking locally polluted PATH like yay: An example being 'PATH=$SYS_PATH yay -Syu --noconfirm'
 export SYS_PATH=$PATH
 
+alias yay='PATH=$SYS_PATH yay'
+
 prepend_path "$HOME/.local/bin"
 if [ -d "${HOME}/homebrew/" ]; then
   prepend_path "$HOME/homebrew/bin"
