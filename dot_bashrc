@@ -6,7 +6,7 @@
 [[ $- != *i* ]] && return
 
 # - Common stuff
-export $(envsubst < ${HOME}/.env)
+set -a; source "${HOME}/.env" 2>/dev/null; set +a
 source "${HOME}/.commonrc"
 
 # - Bash behavior
