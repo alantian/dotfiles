@@ -9,7 +9,9 @@ source "${HOME}/.commonrc"
 bindkey -A emacs main # use emacs keybinding
 
 # Plugins are managed by zplug <https://github.com/zplug/zplug>
-source ~/.zplug/init.zsh
+if [ -f ~/.zplug/init.zsh ]; then
+    source ~/.zplug/init.zsh
+fi
 
 # Plugins. Make sure to use double quotes
 # For more plugins, see 
@@ -52,7 +54,9 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 HISTORY_SUBSTRING_SEARCH_FUZZY=1
 
 # - oh-my-posh
-eval "$(oh-my-posh init zsh --config ${OMP_CONFIG_FILE})"
+if command -v oh-my-posh >/dev/null 2>&1; then
+    eval "$(oh-my-posh init zsh --config "${OMP_CONFIG_FILE}")"
+fi
 
 # thefuck
 (( $+commands[thefuck] )) && eval $(thefuck --alias)

@@ -30,9 +30,8 @@ if [ -d "${HOME}/homebrew/" ]; then
   prepend_ld_library_path "$HOME/homebrew/lib"
 fi
 
-prepend_path
 PROTO_HOME=$HOME/.proto
-if [ -d $PROTO_HOME ]; then
+if [ -d "$PROTO_HOME" ]; then
   prepend_path "$PROTO_HOME/shims:$PROTO_HOME/bin"
 fi
 

@@ -110,7 +110,9 @@ fi
 # ---------------- END: Adopted from Ubuntu's /etc/skel/.bashrc ------------------------
 
 # - oh-my-posh
-eval "$(oh-my-posh init bash --config ${OMP_CONFIG_FILE})"
+if command -v oh-my-posh >/dev/null 2>&1; then
+    eval "$(oh-my-posh init bash --config "${OMP_CONFIG_FILE}")"
+fi
 
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
