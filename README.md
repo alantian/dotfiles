@@ -8,11 +8,27 @@ Refer:
 
 ## Structure
 
+### Shell configs
+
+```mermaid
+flowchart TD
+    .env --> .commonrc
+    .env.local --> .commonrc
+    .commonrc --> .zshrc & .bashrc
+    .zshrc --> .zshrc.local
+    .bashrc --> .bash.local
+    managed["(managed)"]
+    unmanaged["(unmanaged)"]
+
+    style .env.local fill:#FFF9C4
+    style .zshrc.local fill:#FFF9C4
+    style .bash.local fill:#FFF9C4
+    style unmanaged fill:#FFF9C4
+```
+
+### Other files
 ```
 ~/
- .zshrc        # Main zshrc
- .zshrc_local  # Machine specific zshrc, sourced by ~/.zshrc. NOT managed.
- .commonrc     # profiles that are sourced by both zsh and bash.
  .vimrc        # Main vimrc
  .vimrc_local  # Machine specific vimrc, sourced by ~/.vimrc. NOT managed.
  .local/
