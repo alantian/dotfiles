@@ -42,6 +42,7 @@ function main() {
     vim_install_plugins
     ~/.local/bin/oh-my-posh-update.sh
     ~/.local/bin/proto-update.sh
+    (curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh)
   else
     error "WARNING: cannot determine the OS."
   fi
