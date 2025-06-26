@@ -138,6 +138,7 @@ function main() {
         thefuck `# autocorrect command line errors`
         ctop `# top for containers`
 				ttf-meslo-nerd `# some nerd fonts`
+        xplr
       )
       yay_install "${yay_packages[@]}"
     elif [ -f /etc/debian_version ]; then # Debian/Ubuntu

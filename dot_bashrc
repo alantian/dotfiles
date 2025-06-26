@@ -116,6 +116,12 @@ if command -v oh-my-posh >/dev/null 2>&1; then
     eval "$(oh-my-posh init bash --config "${OMP_CONFIG_FILE}")"
 fi
 
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
+fi
+
+
+
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
 fi
