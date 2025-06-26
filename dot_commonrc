@@ -1,5 +1,12 @@
 # Processing PATH and LD_LIBRARY_PATH. Inspired by /etc/profile
 
+if [ -f "${HOME}/.env" ] ; then
+  set -a; source "${HOME}/.env" 2>/dev/null; set +a
+fi
+if [ -f "${HOME}/.env.local" ] ; then
+  set -a; source "${HOME}/.env.local" 2>/dev/null; set +a
+fi
+
 prepend_path () {
     case ":$PATH:" in
         *:"$1":*)

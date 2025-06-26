@@ -6,8 +6,10 @@
 [[ $- != *i* ]] && return
 
 # - Common stuff
-set -a; source "${HOME}/.env" 2>/dev/null; set +a
-source "${HOME}/.commonrc"
+if [ -f "${HOME}/.commonrc" ] ; then
+  source "${HOME}/.commonrc"
+fi
+
 
 # - Bash behavior
 bind '"\e[A": history-search-backward'

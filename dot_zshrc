@@ -1,8 +1,9 @@
 # --- .zshrc ---
 
 # - Common stuff
-set -a; source "${HOME}/.env" 2>/dev/null; set +a
-source "${HOME}/.commonrc"
+if [ -f "${HOME}/.commonrc" ] ; then
+  source "${HOME}/.commonrc"
+fi
 
 # - zsh behaviour
 
@@ -17,7 +18,6 @@ fi
 # For more plugins, see 
 #   - <https://github.com/unixorn/awesome-zsh-plugins>
 #   - <https://github.com/zsh-users>
-
 
 zplug "zsh-users/zsh-history-substring-search"
 zplug "zsh-users/zsh-syntax-highlighting"
