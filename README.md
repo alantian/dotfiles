@@ -15,6 +15,7 @@ flowchart TD
     .env --> .commonrc
     .env.local --> .commonrc
     .commonrc --> .zshrc & .bashrc
+    .zshenv --> .zshrc
     .zshrc --> .zshrc.local
     .bashrc --> .bash.local
     managed["(managed)"]
