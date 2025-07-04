@@ -42,7 +42,13 @@ if [ -d "$PROTO_HOME" ]; then
   prepend_path "$PROTO_HOME/shims:$PROTO_HOME/bin"
 fi
 
-prepend_path "$HOME/.npm-global/bin"
+if [ -d "$HOME/.npm-global/bin" ]; then
+  prepend_path "$HOME/.npm-global/bin"
+fi
+
+if [ -d "$HOME/.fzf/bin" ]; then
+  prepend_path "$HOME/.fzf/bin"
+fi
 
 export PATH
 export LD_LIBRARY_PATH
