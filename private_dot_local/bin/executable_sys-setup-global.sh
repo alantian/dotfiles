@@ -93,7 +93,11 @@ function linux_change_shell_to_zsh() {
 
 function main() {
   ask_system_wide
-
+  
+  do_system_wide && {
+    curl -fsSL https://raw.githubusercontent.com/alantian/setup-scripts/main/basic.sh | bash
+  }
+  
   if [ $(uname) = "Linux" ]; then
     if [ -f /etc/arch-release ]; then # Arch linux
       info "Arch Linux detected"
