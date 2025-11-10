@@ -1,4 +1,7 @@
 # --- .zshrc ---
+#setopt sourcetrace
+#export PS4='+%I:%s:%N> '
+# ^ for debugging
 
 # - Common stuff
 if [ -f "${HOME}/.commonrc" ] ; then
@@ -81,7 +84,6 @@ fi
 if type "fzf" > /dev/null; then
   source <(fzf --zsh)
 fi
-
 
 # --- Load .zshrc that's local to this machine ---
 if [ -f ~/.zshrc.local ]; then . ~/.zshrc.local ; fi
