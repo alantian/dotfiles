@@ -1,5 +1,8 @@
 [ -r "$HOME/.local/shell/zsh/plugins.zsh" ] && . "$HOME/.local/shell/zsh/plugins.zsh"
 
+autoload -Uz compinit
+compinit
+
 if [[ -r /opt/homebrew/share/google-cloud-sdk/path.zsh.inc ]]; then
   source /opt/homebrew/share/google-cloud-sdk/path.zsh.inc
 fi
@@ -30,5 +33,4 @@ if command -v oh-my-posh >/dev/null 2>&1; then
   fi
 fi
 
-autoload -Uz compinit
-compinit
+
