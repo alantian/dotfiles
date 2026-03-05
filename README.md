@@ -1,8 +1,14 @@
 # dotfiles Managed by chezmoi
 
-Refer: https://www.chezmoi.io/
+## Bootstrap
 
-## One-off Operations 
+```bash
+curl https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh | bash
+```
+
+## One-off Setup of chezmoi
+
+Refer: https://www.chezmoi.io/
 
 See <https://www.chezmoi.io/user-guide/setup/>.
 
