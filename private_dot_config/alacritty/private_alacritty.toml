@@ -1,16 +1,27 @@
+[general]
+live_config_reload = true
+import = ["~/.config/alacritty/themes/themes/solarized_light.toml"]
+
+[env]
+TERM = "xterm-256color"
 
 [window]
-opacity = 1.0
 dimensions = { columns = 80, lines = 40 }
+padding = { x = 0, y = 0 }
+decorations = "Full"
+opacity = 0.9
+blur = true
 
 [scrolling]
 history = 100000
+multiplier = 3
 
 [font]
-size = 13.0
-normal = { family = "MesloLGL Nerd Font Mono", style="Regular" }
-bold = { style="Bold" }
-italic = { style="Italic" }
+size = 12.0
+offset = { x = 0, y = 0 }
+normal = { family = "MesloLGL Nerd Font Mono", style = "Regular" }
+bold = { style = "Bold" }
+italic = { style = "Italic" }
 
 [cursor]
 style = { shape = "Block", blinking = "On" }
@@ -20,15 +31,6 @@ hide_when_typing = false
 
 [keyboard]
 bindings = [
-	{key = "N", mods = "Control | Shift", action = "CreateNewWindow"},
-	{key = "F", mods = "Control | Shift", action = "ToggleFullscreen"},
-]
-
-[env]
-TERM = "xterm-256color"
-
-[general]
-live_config_reload = true
-import = [
-    "~/.config/alacritty/themes/themes/solarized_light.toml"
+  { key = "N", mods = "Control | Shift", action = "CreateNewWindow" },
+  { key = "F", mods = "Control | Shift", action = "ToggleFullscreen" },
 ]
