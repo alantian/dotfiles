@@ -1,66 +1,51 @@
 "----------------------------
-" Generic Stuffs and configs
+" Generic settings
 "----------------------------
 
-set nocompatible  " If .vimrc file exists, vim will start in nocompatible mode. But still set it here anywaya
-filetype off
+set nocompatible  " Use Vim defaults (not Vi compatibility)
+filetype plugin indent on  " Enable filetype detection, plugins, and indentation
 
-set tabstop=2     " tabs are at proper location
-set expandtab     " don't use actual tab character (ctrl-v)
-set shiftwidth=2  " indenting is 4 spaces
-set autoindent    " turns it on
-set smartindent   " does the right thing (mostly) in programs
-set paste         " stops indenting with pasting -- should be enabled only when pasting
-set nu            " shows line number
-set mouse=a       " allows mouse clicks to change cursor position
-syntax on         " turns on syntax highlighting
-set wrap          " turns on wrapping
+set tabstop=2     " Display width of a tab character
+set expandtab     " Insert spaces instead of actual tab characters
+set shiftwidth=2  " Indent size for >> and <<
+set autoindent    " Copy indent from current line
+set smartindent   " Smarter auto-indenting for code
+set paste         " Avoid auto-indent while pasting (toggle off after paste)
+set nu            " Show line numbers
+set mouse=a       " Enable mouse in all modes
+syntax on         " Enable syntax highlighting
+set wrap          " Wrap long lines
 
 "--------
-" Vundle
+" vim-plug
 "--------
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
-" Plugins go blow
-" VundleVim will trigger git clone for each configured repository to ~/.vim/bundle/
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-Plugin 'scrooloose/nerdtree'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'kien/ctrlp.vim'
-Plugin 'nathangrigg/vim-beancount'
-" Plugins go above
-call vundle#end()
-filetype plugin on
-" -- Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-" 
-" -- Quickly adding plugins:
-" :source %         - 
-" :PluginInstall
-"
-" see :h vundle for more details or wiki for FAQ
-"
-" -- Install  from commad line
-" vim +PluginInstall +qall # install from command line.
+" Installs plugins into ~/.vim/plugged/
+" Bootstrap vim-plug if missing
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !mkdir -p ~/.vim/autoload
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  augroup PlugBootstrap
+    autocmd!
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  augroup END
+endif
 
-" Put your non-Plugin stuff after this line
+call plug#begin('~/.vim/plugged')
 
+" Plugins
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'              " NERDTree (moved from scrooloose/)
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'kien/ctrlp.vim'
+Plug 'nathangrigg/vim-beancount'
 
-" Plugin-specific configuraitons
-" - vim-airline
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+call plug#end()
 
 "-------------------
-" load .vimrc.local
+" Optional local overrides
 "-------------------
 
 if filereadable(expand('~/.vimrc.local'))

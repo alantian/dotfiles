@@ -1,3 +1,0 @@
-EDITOR=vim
-OMP_CONFIG_FILE=$HOME/.poshthemes/catppuccin_latte.omp.json
-NET_CLI_TELEMETRY_OPTOUT=1
