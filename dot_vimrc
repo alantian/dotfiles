@@ -41,6 +41,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'kien/ctrlp.vim'
 Plug 'nathangrigg/vim-beancount'
+Plug 'tpope/vim-obsession'
 
 call plug#end()
 
