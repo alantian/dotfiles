@@ -90,14 +90,14 @@ install_system_pkgs() {
       else
         echo "Homebrew already installed"
       fi
-      brew install git curl wget
+      brew install git curl wget tmux
       ;;
     ubuntu)
       $SUDO apt-get update -y
-      $SUDO apt-get install -y git curl wget zsh
+      $SUDO apt-get install -y git curl wget zsh tmux
       ;;
     arch)
-      $SUDO pacman -S --needed --noconfirm git curl wget zsh
+      $SUDO pacman -S --needed --noconfirm git curl wget zsh tmux
       ;;
   esac
 }
@@ -188,18 +188,18 @@ install_python() {
 }
 
 # ---------------------------------------------------------------------------
-# chezmoi
+# oh-my-posh
 # ---------------------------------------------------------------------------
-install_chezmoi() {
-  step "Installing/applying chezmoi dotfiles"
+install_oh_my_posh() {
+  step "Installing oh-my-posh"
 
-  if [ -d "$HOME/.local/share/chezmoi/.git" ]; then
-    echo "chezmoi repo already present, applying..."
-    "$HOME/.local/bin/chezmoi" apply
-  else
-    echo "Initialising chezmoi from alantian/dotfiles..."
-    sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- init --apply alantian
+  if command -v oh-my-posh >/dev/null 2>&1; then
+    echo "oh-my-posh already installed: $(oh-my-posh --version)"
+    return
   fi
+
+  echo "Installing oh-my-posh..."
+  curl -s https://ohmyposh.dev/install.sh | bash -s
 }
 
 # ---------------------------------------------------------------------------
@@ -216,7 +216,7 @@ main() {
   install_proto
   install_proto_tools
   install_python
-  install_chezmoi
+  install_oh_my_posh
 
   echo
   echo "========================================"
@@ -227,7 +227,7 @@ main() {
   echo "  zsh:      $(zsh --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  git:      $(git --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  proto:    $($HOME/.proto/bin/proto --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  chezmoi:  $($HOME/.local/bin/chezmoi --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  oh-my-posh: $(oh-my-posh --version 2>/dev/null || echo 'NOT FOUND')"
   echo
   echo "Restart your shell (or open a new terminal) to pick up the new configuration."
 }
