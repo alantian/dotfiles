@@ -90,14 +90,14 @@ install_system_pkgs() {
       else
         echo "Homebrew already installed"
       fi
-      brew install git curl wget tmux
+      brew install git curl wget tmux unzip
       ;;
     ubuntu)
       $SUDO apt-get update -y
-      $SUDO apt-get install -y git curl wget zsh tmux
+      $SUDO apt-get install -y git curl wget zsh tmux unzip
       ;;
     arch)
-      $SUDO pacman -S --needed --noconfirm git curl wget zsh tmux
+      $SUDO pacman -S --needed --noconfirm git curl wget zsh tmux unzip
       ;;
   esac
 }
