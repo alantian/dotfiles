@@ -241,6 +241,23 @@ install_thefuck() {
 }
 
 # ---------------------------------------------------------------------------
+# zinit
+# ---------------------------------------------------------------------------
+install_zinit() {
+  step "Installing zinit and zsh plugins"
+  ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
+  if [ ! -d "$ZINIT_HOME/.git" ]; then
+    echo "Cloning zinit..."
+    mkdir -p "$(dirname "$ZINIT_HOME")"
+    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+  else
+    echo "zinit already present"
+  fi
+  echo "Running zsh interactively to install plugins..."
+  zsh -i -c "exit"
+}
+
+# ---------------------------------------------------------------------------
 # chezmoi
 # ---------------------------------------------------------------------------
 install_chezmoi() {
@@ -274,6 +291,7 @@ main() {
   install_zoxide
   install_thefuck
   install_chezmoi
+  install_zinit
 
   echo
   echo "========================================"
@@ -288,7 +306,7 @@ main() {
   echo "  oh-my-posh: $($HOME/.local/bin/oh-my-posh --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  fzf:        $($HOME/.fzf/bin/fzf --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  zoxide:     $($HOME/.local/bin/zoxide --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  thefuck:    $($HOME/.local/bin/thefuck --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  thefuck:    $($HOME/.local/bin/thefuck --version 2>&1 | head -1 || echo 'NOT FOUND')"
   echo
   echo "Restart your shell (or open a new terminal) to pick up the new configuration."
 }
