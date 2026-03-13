@@ -20,7 +20,7 @@ Single home for shell config. `$HOME` only contains **tiny shim dotfiles** that 
 
 This repo wires it as:
 - `zshenv.sh`: `shared/env.sh` + `shared/hosts/<host>.env.sh`
-- `zprofile.sh`: `~/.secrets.sh` + `direnv hook (zsh)` (if installed) + `brew shellenv`
+- `zprofile.sh`: `~/.secrets.sh` + `brew shellenv`
 - `zshrc.sh`: `shared/interactive.sh` + `shared/aliases.sh` + `shared/hosts/<host>.interactive.sh`
   then `zshrc.zsh` + `hooks.zsh` + `zsh/hosts/<host>.zsh`
 
@@ -34,7 +34,7 @@ This repo wires it as:
 - `bashrc.sh`: `shared/env.sh` + `shared/hosts/<host>.env.sh`
   then `shared/interactive.sh` + `shared/aliases.sh` + `shared/hosts/<host>.interactive.sh`
   then `bashrc.bash` + `hooks.bash` + `bash/hosts/<host>.bash`
-  then `direnv hook (bash)` (if installed)
+
 
 ## What lives where
 - `shared/env.sh`: PATH + safe exports (fast, no aliases, no secrets)
@@ -64,7 +64,7 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 
 ### Quick “where should this line go?” cheatsheet
 - `export PATH=...` / `path=...` → `shared/env.sh`
-- `eval "$(direnv hook ...)"` → `zprofile.sh` / `bashrc.sh` (already present)
+
 - `source <(fzf --zsh)` / completions → `zsh/hooks.zsh` or `bash/hooks.bash`
 - tool init like `eval "$(/opt/homebrew/bin/brew shellenv)"` → avoid; prefer PATH entries in `shared/env.sh`
 

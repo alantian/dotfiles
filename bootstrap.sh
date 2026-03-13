@@ -188,6 +188,59 @@ install_python() {
 }
 
 # ---------------------------------------------------------------------------
+# oh-my-posh
+# ---------------------------------------------------------------------------
+install_oh_my_posh() {
+  step "Installing/upgrading oh-my-posh"
+  if [ -x "$HOME/.local/bin/oh-my-posh" ]; then
+    echo "oh-my-posh already installed, upgrading..."
+  else
+    echo "Installing oh-my-posh..."
+  fi
+  curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
+}
+
+# ---------------------------------------------------------------------------
+# fzf
+# ---------------------------------------------------------------------------
+install_fzf() {
+  step "Installing/upgrading fzf"
+  if [ -d "$HOME/.fzf/.git" ]; then
+    echo "fzf already installed, upgrading..."
+    git -C "$HOME/.fzf" pull --ff-only
+  else
+    echo "Installing fzf..."
+    git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+  fi
+  "$HOME/.fzf/install" --bin --no-bash --no-zsh --no-fish
+}
+
+# ---------------------------------------------------------------------------
+# zoxide
+# ---------------------------------------------------------------------------
+install_zoxide() {
+  step "Installing/upgrading zoxide"
+  curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir "$HOME/.local/bin"
+}
+
+# ---------------------------------------------------------------------------
+# thefuck
+# ---------------------------------------------------------------------------
+install_thefuck() {
+  step "Installing/upgrading thefuck"
+
+  local proto="$HOME/.proto/bin/proto"
+  local uv
+  uv="$("$proto" bin uv 2>/dev/null)" || true
+  if [ -z "$uv" ] || [ ! -x "$uv" ]; then
+    echo "ERROR: uv not found via proto bin uv" >&2
+    exit 1
+  fi
+
+  "$uv" tool install thefuck
+}
+
+# ---------------------------------------------------------------------------
 # chezmoi
 # ---------------------------------------------------------------------------
 install_chezmoi() {
@@ -216,6 +269,10 @@ main() {
   install_proto
   install_proto_tools
   install_python
+  install_oh_my_posh
+  install_fzf
+  install_zoxide
+  install_thefuck
   install_chezmoi
 
   echo
@@ -227,7 +284,11 @@ main() {
   echo "  zsh:      $(zsh --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  git:      $(git --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  proto:    $($HOME/.proto/bin/proto --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  chezmoi:  $($HOME/.local/bin/chezmoi --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  chezmoi:    $($HOME/.local/bin/chezmoi --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  oh-my-posh: $($HOME/.local/bin/oh-my-posh --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  fzf:        $($HOME/.fzf/bin/fzf --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  zoxide:     $($HOME/.local/bin/zoxide --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  thefuck:    $($HOME/.local/bin/thefuck --version 2>/dev/null || echo 'NOT FOUND')"
   echo
   echo "Restart your shell (or open a new terminal) to pick up the new configuration."
 }

@@ -11,4 +11,3 @@ H="${HOSTNAME%%.*}"
 [ -r "$HOME/.local/shell/bash/hooks.bash" ] && . "$HOME/.local/shell/bash/hooks.bash"
 [ -r "$HOME/.local/shell/bash/hosts/$H.bash" ] && . "$HOME/.local/shell/bash/hosts/$H.bash"
 
-command -v direnv >/dev/null 2>&1 && eval "$(direnv hook bash)"
