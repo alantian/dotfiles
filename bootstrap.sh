@@ -194,10 +194,11 @@ install_oh_my_posh() {
   step "Installing/upgrading oh-my-posh"
   if [ -x "$HOME/.local/bin/oh-my-posh" ]; then
     echo "oh-my-posh already installed, upgrading..."
+    "$HOME/.local/bin/oh-my-posh" upgrade
   else
     echo "Installing oh-my-posh..."
+    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
   fi
-  curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
 }
 
 # ---------------------------------------------------------------------------
@@ -254,7 +255,7 @@ install_zinit() {
     echo "zinit already present"
   fi
   echo "Running zsh interactively to install plugins..."
-  zsh -i -c "exit"
+  zsh -i -c "exit" || true
 }
 
 # ---------------------------------------------------------------------------
