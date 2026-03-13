@@ -237,7 +237,7 @@ install_thefuck() {
     exit 1
   fi
 
-  "$uv" tool install thefuck
+  "$uv" tool install thefuck --python 3.11
 }
 
 # ---------------------------------------------------------------------------
