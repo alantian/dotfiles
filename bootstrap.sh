@@ -110,7 +110,7 @@ install_system_pkgs() {
 ensure_zsh_default() {
   step "Ensuring zsh is the default shell"
 
-  local zsh_path
+  local zsh_path current_shell
   zsh_path="$(command -v zsh 2>/dev/null || true)"
 
   if [ -z "$zsh_path" ]; then
@@ -118,8 +118,26 @@ ensure_zsh_default() {
     return
   fi
 
-  if [ "${SHELL:-}" = "$zsh_path" ]; then
-    echo "zsh is already the default shell ($SHELL)"
+  current_shell=""
+  case "$OS_TYPE" in
+    macos)
+      if command -v dscl >/dev/null 2>&1; then
+        current_shell="$(dscl . -read "/Users/$(id -un)" UserShell 2>/dev/null | awk '{print $2}')"
+      fi
+      ;;
+    ubuntu|arch)
+      if command -v getent >/dev/null 2>&1; then
+        current_shell="$(getent passwd "$(id -un)" | cut -d: -f7)"
+      fi
+      ;;
+  esac
+
+  if [ -z "$current_shell" ]; then
+    current_shell="${SHELL:-}"
+  fi
+
+  if [ -n "$current_shell" ] && [ "${current_shell##*/}" = "zsh" ]; then
+    echo "zsh is already the default shell ($current_shell)"
     return
   fi
 
@@ -159,7 +177,7 @@ install_proto() {
 # proto tools
 # ---------------------------------------------------------------------------
 install_proto_tools() {
-  step "Installing proto tools (uv)"
+  step "Installing proto tools (uv, node, npm)"
 
   local proto="$PROTO_HOME/bin/proto"
   if [ ! -x "$proto" ]; then
@@ -167,8 +185,14 @@ install_proto_tools() {
     exit 1
   fi
 
-  echo "  proto install uv"
-  "$proto" install uv
+  echo "  proto install uv latest --pin global"
+  "$proto" install uv latest --pin global -y
+
+  echo "  proto install node latest --pin global"
+  "$proto" install node latest --pin global -y
+
+  echo "  proto install npm latest --pin global"
+  "$proto" install npm latest --pin global -y
 }
 
 # ---------------------------------------------------------------------------
@@ -238,6 +262,10 @@ install_fzf() {
 # ---------------------------------------------------------------------------
 install_zoxide() {
   step "Installing/upgrading zoxide"
+  if command -v zoxide >/dev/null 2>&1; then
+    echo "zoxide already installed ($(zoxide --version 2>/dev/null || echo 'version unknown'))"
+    return
+  fi
   curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir "$HOME/.local/bin"
 }
 
