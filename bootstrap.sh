@@ -9,6 +9,8 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 SUDO=""
 SKIP_SYSTEM_PKGS=false
+PROTO_HOME="${PROTO_HOME:-$HOME/.proto}"
+export PROTO_HOME
 if [ "$(id -u)" -ne 0 ]; then
   if command -v sudo >/dev/null 2>&1; then
     SUDO="sudo"
@@ -140,9 +142,9 @@ ensure_zsh_default() {
 install_proto() {
   step "Installing/upgrading proto"
 
-  if [ -x "$HOME/.proto/bin/proto" ]; then
+  if [ -x "$PROTO_HOME/bin/proto" ]; then
     echo "proto already installed, upgrading..."
-    "$HOME/.proto/bin/proto" upgrade || true
+    "$PROTO_HOME/bin/proto" upgrade || true
   else
     echo "Installing proto..."
     local proto_installer
@@ -159,7 +161,7 @@ install_proto() {
 install_proto_tools() {
   step "Installing proto tools (uv)"
 
-  local proto="$HOME/.proto/bin/proto"
+  local proto="$PROTO_HOME/bin/proto"
   if [ ! -x "$proto" ]; then
     echo "ERROR: proto not found at $proto" >&2
     exit 1
@@ -170,12 +172,27 @@ install_proto_tools() {
 }
 
 # ---------------------------------------------------------------------------
+# proto shims
+# ---------------------------------------------------------------------------
+regen_proto_shims() {
+  step "Regenerating proto shims"
+
+  local proto="$PROTO_HOME/bin/proto"
+  if [ ! -x "$proto" ]; then
+    echo "ERROR: proto not found at $proto" >&2
+    exit 1
+  fi
+
+  "$proto" regen
+}
+
+# ---------------------------------------------------------------------------
 # python (via uv)
 # ---------------------------------------------------------------------------
 install_python() {
   step "Installing Python via uv"
 
-  local proto="$HOME/.proto/bin/proto"
+  local proto="$PROTO_HOME/bin/proto"
   local uv
   uv="$("$proto" bin uv 2>/dev/null)" || true
   if [ -z "$uv" ] || [ ! -x "$uv" ]; then
@@ -230,7 +247,7 @@ install_zoxide() {
 install_thefuck() {
   step "Installing/upgrading thefuck"
 
-  local proto="$HOME/.proto/bin/proto"
+  local proto="$PROTO_HOME/bin/proto"
   local uv
   uv="$("$proto" bin uv 2>/dev/null)" || true
   if [ -z "$uv" ] || [ ! -x "$uv" ]; then
@@ -286,6 +303,7 @@ main() {
   ensure_zsh_default
   install_proto
   install_proto_tools
+  regen_proto_shims
   install_python
   install_oh_my_posh
   install_fzf
@@ -302,12 +320,12 @@ main() {
   echo "Verification:"
   echo "  zsh:      $(zsh --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  git:      $(git --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  proto:    $($HOME/.proto/bin/proto --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  chezmoi:    $($HOME/.local/bin/chezmoi --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  oh-my-posh: $($HOME/.local/bin/oh-my-posh --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  fzf:        $($HOME/.fzf/bin/fzf --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  zoxide:     $($HOME/.local/bin/zoxide --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  thefuck:    $($HOME/.local/bin/thefuck --version 2>&1 | head -1 || echo 'NOT FOUND')"
+  echo "  proto:    $("${PROTO_HOME}/bin/proto" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  chezmoi:    $("${HOME}/.local/bin/chezmoi" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  oh-my-posh: $("${HOME}/.local/bin/oh-my-posh" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  fzf:        $("${HOME}/.fzf/bin/fzf" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  zoxide:     $("${HOME}/.local/bin/zoxide" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  thefuck:    $("${HOME}/.local/bin/thefuck" --version 2>&1 | head -1 || echo 'NOT FOUND')"
   echo
   echo "Restart your shell (or open a new terminal) to pick up the new configuration."
 }
