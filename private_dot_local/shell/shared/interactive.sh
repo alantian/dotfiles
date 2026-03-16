@@ -10,7 +10,7 @@ if [ "$(uname -s)" = "Darwin" ] \
   alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 fi
 
-if command -v thefuck >/dev/null 2>&1; then
+if [ -n "${ZSH_VERSION:-}" ] && command -v thefuck >/dev/null 2>&1; then
   # This is the output of:
   #    eval "$(thefuck --alias)"
   # Update as they are changed.
@@ -25,10 +25,10 @@ if command -v thefuck >/dev/null 2>&1; then
       export TF_HISTORY;
       export PYTHONIOENCODING=utf-8;
       TF_CMD=$(
-          thefuck THEFUCK_ARGUMENT_PLACEHOLDER $@
-      ) && eval $TF_CMD;
+          thefuck THEFUCK_ARGUMENT_PLACEHOLDER "$@"
+      ) && eval "$TF_CMD";
       unset TF_HISTORY;
       export PYTHONIOENCODING=$TF_PYTHONIOENCODING;
-      test -n "$TF_CMD" && print -s $TF_CMD
+      test -n "$TF_CMD" && print -s "$TF_CMD"
   }
 fi

@@ -6,6 +6,11 @@
 curl https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh | bash
 ```
 
+Bootstrap is convenience-first. It installs or updates core packages, ensures
+`zsh` is the default shell, installs `proto` with `PROTO_HOME=~/.proto`,
+globally pins `uv`, `node`, and `npm` to the latest versions, installs
+interactive shell tooling, and then applies the chezmoi-managed dotfiles.
+
 ## One-off Setup of chezmoi
 
 Refer: https://www.chezmoi.io/
@@ -20,10 +25,10 @@ sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- init --apply git@github.com:alantian/
 sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- init --apply alantian
 ```
 
-This installs chezmoi to `~/.local/bin/chezmoi` and keeps repo locally at `.~/local/share/chezmoi`.
+This installs chezmoi to `~/.local/bin/chezmoi` and keeps the source repo at
+`~/.local/share/chezmoi`.
 
 ## Daily Operations
 
 See <https://www.chezmoi.io/user-guide/daily-operations/>.
-
 

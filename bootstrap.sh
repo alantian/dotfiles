@@ -185,6 +185,8 @@ install_proto_tools() {
     exit 1
   fi
 
+  # Intentional: bootstrap is convenience-first and keeps these global proto
+  # tools floated to the latest versions on every rerun.
   echo "  proto install uv latest --pin global"
   "$proto" install uv latest --pin global -y
 
@@ -300,7 +302,11 @@ install_zinit() {
     echo "zinit already present"
   fi
   echo "Running zsh interactively to install plugins..."
-  zsh -i -c "exit" || true
+  # Intentional best-effort step: bootstrap keeps going if plugin hydration
+  # fails, but we warn so the non-zero exit is not silent.
+  if ! zsh -i -c "exit"; then
+    echo "WARNING: zinit/plugin bootstrap reported a non-zero exit status; continuing" >&2
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -308,13 +314,19 @@ install_zinit() {
 # ---------------------------------------------------------------------------
 install_chezmoi() {
   step "Installing/applying chezmoi dotfiles"
+  local chezmoi="$HOME/.local/bin/chezmoi"
+
+  if [ ! -x "$chezmoi" ]; then
+    echo "Installing chezmoi..."
+    sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b "$HOME/.local/bin"
+  fi
 
   if [ -d "$HOME/.local/share/chezmoi/.git" ]; then
     echo "chezmoi repo already present, applying..."
-    "$HOME/.local/bin/chezmoi" apply
+    "$chezmoi" apply
   else
     echo "Initialising chezmoi from alantian/dotfiles..."
-    sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- init --apply alantian
+    "$chezmoi" init --apply alantian
   fi
 }
 
@@ -326,18 +338,25 @@ main() {
   echo " alantian/dotfiles bootstrap"
   echo "========================================"
 
+  # Core machine prerequisites.
   detect_os
   install_system_pkgs
   ensure_zsh_default
+
+  # Language/runtime toolchain.
   install_proto
   install_proto_tools
   regen_proto_shims
   install_python
+  install_thefuck
+
+  # Apply managed dotfiles before interactive shell tooling.
+  install_chezmoi
+
+  # Interactive shell and terminal tooling.
   install_oh_my_posh
   install_fzf
   install_zoxide
-  install_thefuck
-  install_chezmoi
   install_zinit
 
   echo

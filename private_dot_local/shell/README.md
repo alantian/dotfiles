@@ -37,13 +37,23 @@ This repo wires it as:
 
 
 ## What lives where
-- `shared/env.sh`: PATH + safe exports (fast, no aliases, no secrets)
-- `shared/interactive.sh`: interactive-only env tweaks + small helpers
+- `shared/env.sh`: PATH + safe exports (fast, no aliases, no secrets), including
+  XDG variables and `PROTO_HOME`
+- `shared/interactive.sh`: interactive-only env tweaks + small helpers; zsh-only
+  helpers must be guarded there
 - `shared/aliases.sh`: shared aliases/functions
 - `~/.secrets.sh`: **local-only secrets in $HOME** (do not commit, sourced by profile scripts)
 - `shared/hosts/<host>.*`: host-specific shared overrides
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
 - `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)
+
+## Proto
+- `PROTO_HOME` is fixed to `~/.proto` for both bootstrap and login shells.
+- PATH order is `~/.proto/shims` before `~/.proto/bin`, so shims win over the
+  backing binaries.
+- Bootstrap installs and globally pins `uv`, `node`, and `npm` through `proto`.
+- Rerunning bootstrap is intentionally convenience-first and may float those
+  global pins to their latest versions.
 
 ## When a tool installer edits ~/.zshrc or ~/.bashrc
 Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `~/.bashrc`, etc.
@@ -66,9 +76,11 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 - `export PATH=...` / `path=...` → `shared/env.sh`
 
 - `source <(fzf --zsh)` / completions → `zsh/hooks.zsh` or `bash/hooks.bash`
-- tool init like `eval "$(/opt/homebrew/bin/brew shellenv)"` → avoid; prefer PATH entries in `shared/env.sh`
+- tool init like `eval "$(/opt/homebrew/bin/brew shellenv)"` → prefer PATH
+  entries in `shared/env.sh` when possible; keep login-only Homebrew setup in
+  the profile scripts when needed
 
 ## Debug
 - `command -v zsh; command -v bash`
-- `command -v proto; command -v uv`
+- `printf '%s\n' "$PROTO_HOME"; command -v proto; command -v node; command -v npm; command -v uv`
 - zsh clean start: `zsh -f`
