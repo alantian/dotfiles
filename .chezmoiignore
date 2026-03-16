@@ -2,3 +2,4 @@
 .config/alacritty/themes/images/**
 README.md
 .secrets.sh
+bootstrap.sh
