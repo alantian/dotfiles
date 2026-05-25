@@ -39,3 +39,15 @@ export PATH
 export EDITOR="${EDITOR:-vim}"
 export PAGER="${PAGER:-less}"
 export LANG="${LANG:-en_US.UTF-8}"
+
+## Load user-level env files if present. .env first (shared defaults),
+## then .env.local (host-specific overrides / secrets). `set -a` auto-exports
+## every assignment so child processes (e.g. `uv run`) inherit them.
+for f in "$HOME/.env" "$HOME/.env.local"; do
+  if [ -r "$f" ]; then
+    set -a
+    . "$f"
+    set +a
+  fi
+done
+unset f
