@@ -33,6 +33,9 @@ path_prepend "$HOME/.fzf/bin"
 ## opencode bins
 path_prepend "$HOME/.opencode/bin"
 
+## kimi-code
+path_prepend "$HOME/.kimi-code/bin"
+
 export PATH
 
 
