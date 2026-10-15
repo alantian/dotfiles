@@ -100,7 +100,10 @@ proto versions node                   # all versions available for one tool
    `dot_proto/dot_prototools` in the source and `chezmoi git -- commit`.
 2. `chezmoi apply`, then `proto install --config-mode global` (installs the
    new pins; without the flag proto only looks for a project-level
-   `.prototools`), then `proto regen` if a shim is missing.
+   `.prototools`), then `proto regen` if a shim is missing. Then `rehash`
+   (zsh) / `hash -r` (bash) or open a new shell: zsh caches PATH directory
+   listings, so shims created in the current session look "not found" until
+   then.
 3. If node changed: `npm install -g @google/gemini-cli @openai/codex @earendil-works/pi-coding-agent`
    (their native parts are prebuilt per node major; reinstalling refreshes them).
 4. Remove the old version explicitly: `proto uninstall node 26.12.0`.
