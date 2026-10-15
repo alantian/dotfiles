@@ -2,6 +2,11 @@
 
 Single home for shell config. `$HOME` only contains **tiny shim dotfiles** that source into here.
 
+## Before changing anything
+These dotfiles are used on several hosts and any of them may have pushed. Run
+`chezmoi update` (pull + apply) before editing, and `chezmoi git -- push` after.
+Editing on a stale checkout produces merge conflicts in `~/.local/share/chezmoi`.
+
 ## Shim mapping (HOME → ~/.local/shell)
 - `~/.zshenv` → `~/.local/shell/zsh/zshenv.sh`
 - `~/.zprofile` → `~/.local/shell/zsh/zprofile.sh`
@@ -37,7 +42,7 @@ This repo wires it as (same `<layer>` expansion as zsh):
   then `bashrc.bash` + `hooks.bash` + `bash/<layer>.bash`
 
 ### Layers: shared → os → distro → host
-`shared/env.sh` exports `SHELL_OS` (`darwin`, `linux`, `other`, from `uname -s`) and
+`shared/env.sh` exports `SHELL_OS` (`darwin`, `linux`, `other`, from `$OSTYPE`, `uname -s` only as fallback) and
 `SHELL_DISTRO` (the `ID` from `/etc/os-release` on Linux, e.g. `arch`, `ubuntu`; empty
 elsewhere). Later layers win. Put a thing in the narrowest layer that is still true:
 - `shared/*`: true everywhere; guard on tool presence (`command -v`), never on OS
@@ -112,6 +117,9 @@ proto versions node                   # all versions available for one tool
    devbox01 on 2026-10-15; recovered with `chezmoi apply` + `proto install`).
 5. `chezmoi git -- push` so other machines pick up the pin.
 
+Shortcut: `proto install node 26.13.0 --pin global` edits the live file; follow
+with `chezmoi add ~/.proto/.prototools` so the dotfiles follow.
+
 ### npm global tools and npm/node updates
 - `npm = "bundled"` means npm is updated by updating the **node** pin; there is
   no separate npm pin to maintain.
@@ -122,15 +130,15 @@ proto versions node                   # all versions available for one tool
   `npm outdated -g` then `npm update -g`, or `npm install -g <pkg>@latest`.
 - After a node **major** bump, run the `npm install -g ...` line above once to
   refresh their prebuilt native modules.
-
-Shortcut: `proto install node 26.13.0 --pin global` edits the live file; follow
-with `chezmoi add ~/.proto/.prototools` so the dotfiles follow.
+- `python3` is **not** shimmed by proto (only `python` and `pip` are), so it is
+  the system's or Homebrew's. Decided and accepted: use `python` or `uv run`.
 
 ### macOS specifics
 - `/etc/zprofile` runs `path_helper` after `~/.zshenv` and rebuilds PATH with
   the system dirs first. `shared/os/darwin.profile.sh` runs at zprofile stage
   and re-asserts Homebrew ahead of the system dirs and our dirs ahead of
-  Homebrew. In a new Terminal window `which node uv python3` must be proto shims.
+  Homebrew. In a new Terminal window `which node npm pnpm uv python` must all be
+  `~/.proto/shims/...`; `python3` is Homebrew's, by design.
 - Do not `brew install` node, uv, python or pnpm for our use; if a brew formula
   pulls one in as a dependency, that is fine, it is shadowed.
 
@@ -155,9 +163,9 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 - `export PATH=...` / `path=...` → `shared/env.sh`
 
 - `source <(fzf --zsh)` / completions → `zsh/hooks.zsh` or `bash/hooks.bash`
-- tool init like `eval "$(/opt/homebrew/bin/brew shellenv)"` → prefer PATH
-  entries in `shared/env.sh` when possible; keep login-only Homebrew setup in
-  the profile scripts when needed
+- tool init like `eval "$(/opt/homebrew/bin/brew shellenv)"` → it already lives
+  in `shared/os/darwin.profile.sh`; OS-specific login setup goes in
+  `shared/os/<os>.profile.sh`, host-specific in `shared/hosts/<host>.profile.sh`
 
 ## Debug
 - `command -v zsh; command -v bash`
