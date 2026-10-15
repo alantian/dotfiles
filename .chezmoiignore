@@ -3,3 +3,5 @@
 README.md
 .env.local
 bootstrap.sh
+.zshrc.local
+.bashrc.local
