@@ -13,6 +13,20 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export PROTO_HOME="${PROTO_HOME:-$HOME/.proto}"
 
+## OS / distro tags for the os/ layer (shared/os/<tag>.*, zsh/os/, bash/os/).
+## SHELL_OS is darwin|linux|other; SHELL_DISTRO is the ID from /etc/os-release
+## on Linux (arch, ubuntu, ...) or empty.
+case "$(uname -s)" in
+  Darwin) SHELL_OS=darwin ;;
+  Linux)  SHELL_OS=linux ;;
+  *)      SHELL_OS=other ;;
+esac
+SHELL_DISTRO=""
+if [ "$SHELL_OS" = linux ] && [ -r /etc/os-release ]; then
+  SHELL_DISTRO=$(. /etc/os-release 2>/dev/null; printf '%s' "${ID:-}")
+fi
+export SHELL_OS SHELL_DISTRO
+
 path_prepend "$HOME/.local/bin"
 path_prepend "$HOME/bin"
 
@@ -20,9 +34,6 @@ path_prepend "$HOME/bin"
 ## Keep shims before bin on PATH so runtime version detection works.
 path_prepend "$PROTO_HOME/bin"
 path_prepend "$PROTO_HOME/shims"
-
-## Homebrew common paths
-path_prepend /opt/homebrew/bin
 
 ## npm global bins 
 path_prepend "$HOME/.npm-global/bin"

@@ -3,13 +3,6 @@ export LESSHISTFILE="-"
 
 mkcd() { mkdir -p "$1" && cd "$1" || return; }
 
-# Only on macOS, only if the app exists, and only if tailscale isn't already on PATH
-if [ "$(uname -s)" = "Darwin" ] \
-  && [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ] \
-  && ! command -v tailscale >/dev/null 2>&1; then
-  alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
-fi
-
 if [ -n "${ZSH_VERSION:-}" ] && command -v thefuck >/dev/null 2>&1; then
   # This is the output of:
   #    eval "$(thefuck --alias)"

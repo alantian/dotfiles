@@ -18,22 +18,31 @@ Single home for shell config. `$HOME` only contains **tiny shim dotfiles** that 
 - **interactive non-login**: `~/.zshenv` → `~/.zshrc`
 - **non-interactive (`zsh -c`)**: `~/.zshenv` only
 
-This repo wires it as:
-- `zshenv.sh`: `shared/env.sh` + `shared/hosts/<host>.env.sh`
-- `zprofile.sh`: `brew shellenv` (login-only setup)
-- `zshrc.sh`: `shared/interactive.sh` + `shared/aliases.sh` + `shared/hosts/<host>.interactive.sh`
-  then `zshrc.zsh` + `hooks.zsh` + `zsh/hosts/<host>.zsh`
+This repo wires it as (`<layer>` expands to `os/<os>`, then `os/<distro>`, then `hosts/<host>`, each only if the file exists):
+- `zshenv.sh`: `shared/env.sh` + `shared/<layer>.env.sh`
+- `zprofile.sh`: `shared/<layer>.profile.sh` (login-only setup, e.g. `brew shellenv` on macOS)
+- `zshrc.sh`: `shared/interactive.sh` + `shared/aliases.sh` + `shared/<layer>.interactive.sh`
+  then `zshrc.zsh` + `hooks.zsh` + `zsh/<layer>.zsh`
 
 ### bash
 - **interactive login**: `~/.bash_profile` (which sources `~/.bashrc`)
 - **interactive non-login**: `~/.bashrc`
 - **non-interactive scripts**: does *not* read these by default
 
-This repo wires it as:
-- `bash_profile.sh`: sources `bashrc.sh` + `brew shellenv`
-- `bashrc.sh`: `shared/env.sh` + `shared/hosts/<host>.env.sh`
-  then `shared/interactive.sh` + `shared/aliases.sh` + `shared/hosts/<host>.interactive.sh`
-  then `bashrc.bash` + `hooks.bash` + `bash/hosts/<host>.bash`
+This repo wires it as (same `<layer>` expansion as zsh):
+- `bash_profile.sh`: sources `bashrc.sh` + `shared/<layer>.profile.sh`
+- `bashrc.sh`: `shared/env.sh` + `shared/<layer>.env.sh`
+  then `shared/interactive.sh` + `shared/aliases.sh` + `shared/<layer>.interactive.sh`
+  then `bashrc.bash` + `hooks.bash` + `bash/<layer>.bash`
+
+### Layers: shared → os → distro → host
+`shared/env.sh` exports `SHELL_OS` (`darwin`, `linux`, `other`, from `uname -s`) and
+`SHELL_DISTRO` (the `ID` from `/etc/os-release` on Linux, e.g. `arch`, `ubuntu`; empty
+elsewhere). Later layers win. Put a thing in the narrowest layer that is still true:
+- `shared/*`: true everywhere; guard on tool presence (`command -v`), never on OS
+- `shared/os/darwin.*`, `zsh/os/darwin.zsh`: macOS only (Homebrew paths and shellenv, Tailscale app alias, gcloud from Homebrew)
+- `shared/os/arch.*`: Arch Linux only (`yay` wrapper)
+- `shared/hosts/<host>.*`, `zsh/hosts/<host>.zsh`, `bash/hosts/<host>.bash`: one machine only
 
 
 ## What lives where
@@ -47,6 +56,7 @@ This repo wires it as:
 - `~/.env`: shared non-secret defaults in `KEY=value` form (optional)
 - `~/.env.local`: **local-only secrets and host overrides in $HOME**, `KEY=value`
   form; in `.chezmoiignore`, never committed
+- `shared/os/<os|distro>.*`: OS- or distro-specific overrides (see Layers above)
 - `shared/hosts/<host>.*`: host-specific shared overrides
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
 - `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)
@@ -67,7 +77,7 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 ### Fix procedure
 1) Open the modified file in `$HOME` (e.g. `~/.zshrc`).
 2) **Move the added lines** into the right place under `~/.local/shell/`:
-   - PATH exports → `shared/env.sh` (or `shared/hosts/<host>.env.sh` if host-only)
+   - PATH exports → `shared/env.sh` (or `shared/os/<os>.env.sh` / `shared/hosts/<host>.env.sh` if OS- or host-only)
    - shell hooks / `eval ...` / `source <(...)` → `zsh/hooks.zsh` or `bash/hooks.bash`
    - login-only changes (should apply once per session) → `zsh/zprofile.sh` or `bash/bash_profile.sh`
    - aliases/functions → `shared/aliases.sh` (portable) or `zshrc.zsh` / `bashrc.bash` (shell-only)
@@ -88,3 +98,11 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 - `command -v zsh; command -v bash`
 - `printf '%s\n' "$PROTO_HOME"; command -v proto; command -v node; command -v npm; command -v uv`
 - zsh clean start: `zsh -f`
+
+## Git config
+`~/.gitconfig` is a chezmoi template (`dot_gitconfig.tmpl`) with **no default identity**.
+Identity is applied by `includeIf "gitdir:..."` for `~/code/` and `~/.local/share/chezmoi/`
+from `~/.config/git/identity-personal`. Repos elsewhere must set `user.name`/`user.email`
+per repo. Override the directory list per host with `git_personal_dirs` under `[data]` in
+`~/.config/chezmoi/chezmoi.toml`. The credential helper is `osxkeychain` on macOS and
+`store` elsewhere. `~/.config/git/ignore` is the global ignore list.
