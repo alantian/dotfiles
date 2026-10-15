@@ -14,14 +14,11 @@ if [ ! -r "${ZINIT_HOME}/zinit.zsh" ]; then
 else
   source "${ZINIT_HOME}/zinit.zsh"
 
-  zinit load zdharma-continuum/history-search-multi-word
   zinit light zsh-users/zsh-autosuggestions
   zinit light zsh-users/zsh-history-substring-search
 
   zinit ice blockf
   zinit light zsh-users/zsh-completions
-
-  zinit light egorlem/ultima.zsh-theme
 
   zinit light zsh-users/zsh-syntax-highlighting # load late
 fi

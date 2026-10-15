@@ -20,7 +20,7 @@ Single home for shell config. `$HOME` only contains **tiny shim dotfiles** that 
 
 This repo wires it as:
 - `zshenv.sh`: `shared/env.sh` + `shared/hosts/<host>.env.sh`
-- `zprofile.sh`: `~/.secrets.sh` + `brew shellenv`
+- `zprofile.sh`: `brew shellenv` (login-only setup)
 - `zshrc.sh`: `shared/interactive.sh` + `shared/aliases.sh` + `shared/hosts/<host>.interactive.sh`
   then `zshrc.zsh` + `hooks.zsh` + `zsh/hosts/<host>.zsh`
 
@@ -30,7 +30,7 @@ This repo wires it as:
 - **non-interactive scripts**: does *not* read these by default
 
 This repo wires it as:
-- `bash_profile.sh`: sources `bashrc.sh` + `~/.secrets.sh` + `brew shellenv`
+- `bash_profile.sh`: sources `bashrc.sh` + `brew shellenv`
 - `bashrc.sh`: `shared/env.sh` + `shared/hosts/<host>.env.sh`
   then `shared/interactive.sh` + `shared/aliases.sh` + `shared/hosts/<host>.interactive.sh`
   then `bashrc.bash` + `hooks.bash` + `bash/hosts/<host>.bash`
@@ -38,11 +38,15 @@ This repo wires it as:
 
 ## What lives where
 - `shared/env.sh`: PATH + safe exports (fast, no aliases, no secrets), including
-  XDG variables and `PROTO_HOME`
+  XDG variables and `PROTO_HOME`; at the end it sources `~/.env` then
+  `~/.env.local` with `set -a`, so every shell (including non-interactive)
+  gets them
 - `shared/interactive.sh`: interactive-only env tweaks + small helpers; zsh-only
   helpers must be guarded there
 - `shared/aliases.sh`: shared aliases/functions
-- `~/.secrets.sh`: **local-only secrets in $HOME** (do not commit, sourced by profile scripts)
+- `~/.env`: shared non-secret defaults in `KEY=value` form (optional)
+- `~/.env.local`: **local-only secrets and host overrides in $HOME**, `KEY=value`
+  form; in `.chezmoiignore`, never committed
 - `shared/hosts/<host>.*`: host-specific shared overrides
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
 - `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)

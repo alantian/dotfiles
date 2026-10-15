@@ -10,7 +10,6 @@ set expandtab     " Insert spaces instead of actual tab characters
 set shiftwidth=2  " Indent size for >> and <<
 set autoindent    " Copy indent from current line
 set smartindent   " Smarter auto-indenting for code
-set paste         " Avoid auto-indent while pasting (toggle off after paste)
 set nu            " Show line numbers
 set mouse=a       " Enable mouse in all modes
 syntax on         " Enable syntax highlighting
