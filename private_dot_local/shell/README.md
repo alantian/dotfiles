@@ -100,9 +100,7 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 - zsh clean start: `zsh -f`
 
 ## Git config
-`~/.gitconfig` is a chezmoi template (`dot_gitconfig.tmpl`) with **no default identity**.
-Identity is applied by `includeIf "gitdir:..."` for `~/code/` and `~/.local/share/chezmoi/`
-from `~/.config/git/identity-personal`. Repos elsewhere must set `user.name`/`user.email`
-per repo. Override the directory list per host with `git_personal_dirs` under `[data]` in
-`~/.config/chezmoi/chezmoi.toml`. The credential helper is `osxkeychain` on macOS and
-`store` elsewhere. `~/.config/git/ignore` is the global ignore list.
+`~/.gitconfig` is a chezmoi template (`dot_gitconfig.tmpl`): one global identity for
+every repo (a repo-local `git config user.name/email` overrides it as usual), the
+credential helper (`osxkeychain` on macOS, `store` elsewhere) and git-lfs filters.
+`~/.config/git/ignore` is the global ignore list.

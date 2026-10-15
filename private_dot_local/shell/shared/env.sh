@@ -15,15 +15,22 @@ export PROTO_HOME="${PROTO_HOME:-$HOME/.proto}"
 
 ## OS / distro tags for the os/ layer (shared/os/<tag>.*, zsh/os/, bash/os/).
 ## SHELL_OS is darwin|linux|other; SHELL_DISTRO is the ID from /etc/os-release
-## on Linux (arch, ubuntu, ...) or empty.
-case "$(uname -s)" in
-  Darwin) SHELL_OS=darwin ;;
-  Linux)  SHELL_OS=linux ;;
-  *)      SHELL_OS=other ;;
+## on Linux (arch, ubuntu, ...) or empty. Fork-free: uses $OSTYPE (set by zsh
+## and bash) and a builtin read of /etc/os-release; falls back to uname only
+## if $OSTYPE is unset. Cost is ~10 microseconds.
+case "${OSTYPE:-$(uname -s)}" in
+  darwin*|Darwin) SHELL_OS=darwin ;;
+  linux*|Linux)   SHELL_OS=linux ;;
+  *)              SHELL_OS=other ;;
 esac
 SHELL_DISTRO=""
 if [ "$SHELL_OS" = linux ] && [ -r /etc/os-release ]; then
-  SHELL_DISTRO=$(. /etc/os-release 2>/dev/null; printf '%s' "${ID:-}")
+  while IFS= read -r _l; do
+    case $_l in
+      ID=*) SHELL_DISTRO=${_l#ID=}; SHELL_DISTRO=${SHELL_DISTRO%\"}; SHELL_DISTRO=${SHELL_DISTRO#\"}; break ;;
+    esac
+  done < /etc/os-release
+  unset _l
 fi
 export SHELL_OS SHELL_DISTRO
 

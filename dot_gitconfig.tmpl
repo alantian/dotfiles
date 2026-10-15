@@ -1,17 +1,9 @@
 # Managed by chezmoi (source: dot_gitconfig.tmpl). Do not edit in place.
-#
-# No default identity on purpose. Identity comes from the includeIf blocks
-# below, so a repo outside those directories has no user.name/user.email
-# and must set them per repo:  git config user.name ...; git config user.email ...
-# Override the directory list per host in ~/.config/chezmoi/chezmoi.toml:
-#   [data]
-#   git_personal_dirs = ["~/code/", "~/.local/share/chezmoi/"]
-{{- $dirs := list "~/code/" "~/.local/share/chezmoi/" }}
-{{- if hasKey . "git_personal_dirs" }}{{ $dirs = .git_personal_dirs }}{{ end }}
-{{ range $dirs }}
-[includeIf "gitdir:{{ . }}"]
-	path = ~/.config/git/identity-personal
-{{- end }}
+# One global identity for every repo; a repo-local `git config user.name/email`
+# overrides it as usual.
+[user]
+	name = Yingtao Tian
+	email = alan.yt.tian@gmail.com
 
 [credential]
 {{- if eq .chezmoi.os "darwin" }}
