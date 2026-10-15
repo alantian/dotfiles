@@ -13,10 +13,12 @@ for _l in "os/$SHELL_OS" "os/$SHELL_DISTRO" "hosts/$H"; do
 done
 unset _l
 
-# Machine-local zsh config, deliberately outside chezmoi. Loaded last so it can
-# override everything above. On Arch with grml-zsh-config, /etc/zsh/zshrc has
-# already sourced it before ~/.zshrc; the file sets _ZSHRC_LOCAL_LOADED so this
-# second load is skipped. Elsewhere this is the only load.
-if [ -z "${_ZSHRC_LOCAL_LOADED-}" ] && [ -r "$HOME/.zshrc.local" ]; then
+# Host-local zsh config, deliberately outside chezmoi. Loaded last so it can
+# override everything above. This is the ONLY sanctioned loader: the file must
+# start with `[[ -n ${_ZSHRC_LOCAL_FROM_DOTFILES-} ]] || return`, so any other
+# loader (Arch's grml /etc/zsh/zshrc sources it early) is a no-op.
+if [ -r "$HOME/.zshrc.local" ]; then
+  _ZSHRC_LOCAL_FROM_DOTFILES=1
   . "$HOME/.zshrc.local"
+  unset _ZSHRC_LOCAL_FROM_DOTFILES
 fi

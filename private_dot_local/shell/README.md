@@ -59,10 +59,12 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
   form; in `.chezmoiignore`, never committed
 - `shared/os/<os|distro>.*`: OS- or distro-specific overrides (see Layers above)
 - `shared/hosts/<host>.*`: host-specific shared overrides
-- `~/.zshrc.local`: **machine-local zsh config, not in chezmoi**, loaded last by
-  `zshrc.sh`. It should start with a guard so a second load is a no-op (Arch's
-  `grml-zsh-config` sources it from `/etc/zsh/zshrc` *before* `~/.zshrc`):
-  `[[ -n ${_ZSHRC_LOCAL_LOADED-} ]] && return; _ZSHRC_LOCAL_LOADED=1`
+- `~/.zshrc.local`: **host-local zsh config, not in chezmoi** (it is in
+  `.chezmoiignore`), loaded last by `zshrc.sh`, which sets
+  `_ZSHRC_LOCAL_FROM_DOTFILES=1` around the source. The file must start with
+  `[[ -n ${_ZSHRC_LOCAL_FROM_DOTFILES-} ]] || return` so that any other loader
+  is a no-op (Arch's `grml-zsh-config` sources it from `/etc/zsh/zshrc`
+  *before* `~/.zshrc`; with the guard that early load does nothing).
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
 - `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)
 
