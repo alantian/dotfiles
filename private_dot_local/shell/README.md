@@ -68,13 +68,68 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
 - `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)
 
-## Proto
-- `PROTO_HOME` is fixed to `~/.proto` for both bootstrap and login shells.
+## Toolchain ownership (proto)
+- **proto owns node, npm, pnpm, uv and python for our use, on every OS.**
+  `PROTO_HOME` is `~/.proto`. Pins live in the chezmoi-managed
+  `~/.proto/.prototools` (source: `dot_proto/dot_prototools`) with explicit
+  versions; `npm = "bundled"` means the npm shipped inside the pinned node.
+  Nothing floats: a rerun of bootstrap installs exactly those versions.
 - PATH order is `~/.proto/shims` before `~/.proto/bin`, so shims win over the
-  backing binaries.
-- Bootstrap installs and globally pins `uv`, `node`, and `npm` through `proto`.
-- Rerunning bootstrap is intentionally convenience-first and may float those
-  global pins to their latest versions.
+  backing binaries. `user_path_setup` in `shared/env.sh` builds this order with
+  *forced* prepends, so calling it again later restores the order after
+  something else (Homebrew, macOS `path_helper`) has pushed its dirs in front.
+- **System copies are allowed but shadowed.** `pacman -S nodejs`, `brew install
+  node`, `apt install python3` etc. may exist because other system packages
+  need them. Our shells always put proto shims first, so `node`, `npm`, `uv`,
+  `python` resolve to proto's. System packages are unaffected: they call
+  `/usr/bin/node` by absolute path. Never rely on the system copy for our tools.
+- npm global tools (gemini-cli, codex, pi) are installed by proto's npm into
+  the prefix from the managed `~/.npmrc` (`~/.npm-global`); bootstrap does this
+  in `install_npm_globals`. npm 11+ skips package install scripts for global
+  installs and warns; these three work regardless (their native parts are
+  prebuilt), so the warning can be ignored.
+
+### Checking for updates
+```
+proto outdated --config-mode global   # list pinned tools with newer versions
+proto versions node                   # all versions available for one tool
+```
+
+### Updating a pin
+1. Edit the pin: `chezmoi edit ~/.proto/.prototools` (auto-commits), or edit
+   `dot_proto/dot_prototools` in the source and `chezmoi git -- commit`.
+2. `chezmoi apply`, then `proto install --config-mode global` (installs the
+   new pins; without the flag proto only looks for a project-level
+   `.prototools`), then `proto regen` if a shim is missing.
+3. If node changed: `npm install -g @google/gemini-cli @openai/codex @earendil-works/pi-coding-agent`
+   (their native parts are prebuilt per node major; reinstalling refreshes them).
+4. Remove the old version explicitly: `proto uninstall node 26.12.0`.
+   **Never use `proto clean --days 0`**: it deletes *every* installed version,
+   pinned ones included, and strips the pins out of `.prototools` (happened on
+   devbox01 on 2026-10-15; recovered with `chezmoi apply` + `proto install`).
+5. `chezmoi git -- push` so other machines pick up the pin.
+
+### npm global tools and npm/node updates
+- `npm = "bundled"` means npm is updated by updating the **node** pin; there is
+  no separate npm pin to maintain.
+- The global packages in `~/.npm-global` are plain files; a node or npm update
+  does not touch them. They keep running as long as the node version satisfies
+  their `engines` (gemini-cli needs 20+, codex 16+, pi 22.19+).
+- They are not updated automatically either. To check and update them:
+  `npm outdated -g` then `npm update -g`, or `npm install -g <pkg>@latest`.
+- After a node **major** bump, run the `npm install -g ...` line above once to
+  refresh their prebuilt native modules.
+
+Shortcut: `proto install node 26.13.0 --pin global` edits the live file; follow
+with `chezmoi add ~/.proto/.prototools` so the dotfiles follow.
+
+### macOS specifics
+- `/etc/zprofile` runs `path_helper` after `~/.zshenv` and rebuilds PATH with
+  the system dirs first. `shared/os/darwin.profile.sh` runs at zprofile stage
+  and re-asserts Homebrew ahead of the system dirs and our dirs ahead of
+  Homebrew. In a new Terminal window `which node uv python3` must be proto shims.
+- Do not `brew install` node, uv, python or pnpm for our use; if a brew formula
+  pulls one in as a dependency, that is fine, it is shadowed.
 
 ## When a tool installer edits ~/.zshrc or ~/.bashrc
 Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `~/.bashrc`, etc.

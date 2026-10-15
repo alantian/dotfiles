@@ -177,24 +177,38 @@ install_proto() {
 # proto tools
 # ---------------------------------------------------------------------------
 install_proto_tools() {
-  step "Installing proto tools (uv, node, npm)"
+  step "Installing proto tools pinned in ~/.proto/.prototools"
 
   local proto="$PROTO_HOME/bin/proto"
   if [ ! -x "$proto" ]; then
     echo "ERROR: proto not found at $proto" >&2
     exit 1
   fi
+  if [ ! -f "$PROTO_HOME/.prototools" ]; then
+    echo "ERROR: $PROTO_HOME/.prototools missing; it is managed by chezmoi and should have been applied" >&2
+    exit 1
+  fi
 
-  # Intentional: bootstrap is convenience-first and keeps these global proto
-  # tools floated to the latest versions on every rerun.
-  echo "  proto install uv latest --pin global"
-  "$proto" install uv latest --pin global -y
+  # Versions are pinned explicitly in the chezmoi-managed .prototools (node,
+  # npm, pnpm, uv, python). Nothing floats; rerunning bootstrap is reproducible.
+  echo "  proto install --config-mode global   # all tools from $PROTO_HOME/.prototools"
+  "$proto" install --config-mode global -y
+}
 
-  echo "  proto install node latest --pin global"
-  "$proto" install node latest --pin global -y
+# ---------------------------------------------------------------------------
+# npm global tools (installed with proto's npm, into the ~/.npmrc prefix)
+# ---------------------------------------------------------------------------
+NPM_GLOBALS=(@google/gemini-cli @openai/codex @earendil-works/pi-coding-agent)
 
-  echo "  proto install npm latest --pin global"
-  "$proto" install npm latest --pin global -y
+install_npm_globals() {
+  step "Installing npm global tools: ${NPM_GLOBALS[*]}"
+
+  local npm="$PROTO_HOME/shims/npm"
+  if [ ! -x "$npm" ]; then
+    echo "ERROR: proto npm shim not found at $npm (run proto regen?)" >&2
+    exit 1
+  fi
+  "$npm" install -g "${NPM_GLOBALS[@]}"
 }
 
 # ---------------------------------------------------------------------------
@@ -343,15 +357,17 @@ main() {
   install_system_pkgs
   ensure_zsh_default
 
-  # Language/runtime toolchain.
+  # Managed dotfiles first: they carry ~/.proto/.prototools (tool pins) and
+  # ~/.npmrc (npm prefix) that the toolchain steps below depend on.
+  install_chezmoi
+
+  # Language/runtime toolchain, pinned by ~/.proto/.prototools.
   install_proto
   install_proto_tools
   regen_proto_shims
   install_python
   install_thefuck
-
-  # Apply managed dotfiles before interactive shell tooling.
-  install_chezmoi
+  install_npm_globals
 
   # Interactive shell and terminal tooling.
   install_oh_my_posh

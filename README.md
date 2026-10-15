@@ -8,7 +8,9 @@ curl https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh | bas
 
 Bootstrap is convenience-first. It installs or updates core packages, ensures
 `zsh` is the default shell, installs `proto` with `PROTO_HOME=~/.proto`,
-globally pins `uv`, `node`, and `npm` to the latest versions, installs
+installs the proto-pinned toolchain from the managed `~/.proto/.prototools`
+(node, npm, pnpm, uv, python; explicit versions, nothing floats), installs the
+npm global tools, installs
 interactive shell tooling, and then applies the chezmoi-managed dotfiles.
 
 ## One-off Setup of chezmoi

@@ -8,6 +8,23 @@ path_prepend() {
   esac
 }
 
+# Remove every occurrence of $1 from PATH. Pure shell, no forks.
+path_remove() {
+  _p=":$PATH:"
+  while case $_p in *":$1:"*) true ;; *) false ;; esac; do
+    _p="${_p%%":$1:"*}:${_p#*":$1:"}"
+  done
+  _p=${_p#:}; PATH=${_p%:}
+  unset _p
+}
+
+# Prepend $1 even if it is already on PATH (moves it to the front).
+path_force_prepend() {
+  [ -d "$1" ] || return 0
+  path_remove "$1"
+  PATH="$1${PATH:+:$PATH}"
+}
+
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -34,27 +51,23 @@ if [ "$SHELL_OS" = linux ] && [ -r /etc/os-release ]; then
 fi
 export SHELL_OS SHELL_DISTRO
 
-path_prepend "$HOME/.local/bin"
-path_prepend "$HOME/bin"
-
-## proto launcher + tool shims/bins
-## Keep shims before bin on PATH so runtime version detection works.
-path_prepend "$PROTO_HOME/bin"
-path_prepend "$PROTO_HOME/shims"
-
-## npm global bins 
-path_prepend "$HOME/.npm-global/bin"
-
-## fzf bins 
-path_prepend "$HOME/.fzf/bin"
-
-## opencode bins
-path_prepend "$HOME/.opencode/bin"
-
-## kimi-code
-path_prepend "$HOME/.kimi-code/bin"
-
-export PATH
+## Our user-owned bin dirs, in priority order (last call wins = first on PATH).
+## Forced, so calling this again after something else prepended (Homebrew on
+## macOS, macOS path_helper) restores this order. Idempotent and fork-free.
+user_path_setup() {
+  path_force_prepend "$HOME/.local/bin"
+  path_force_prepend "$HOME/bin"
+  ## proto launcher + tool shims/bins; shims before bin so version detection works
+  path_force_prepend "$PROTO_HOME/bin"
+  path_force_prepend "$PROTO_HOME/shims"
+  ## npm global bins (prefix from ~/.npmrc)
+  path_force_prepend "$HOME/.npm-global/bin"
+  path_force_prepend "$HOME/.fzf/bin"
+  path_force_prepend "$HOME/.opencode/bin"
+  path_force_prepend "$HOME/.kimi-code/bin"
+  export PATH
+}
+user_path_setup
 
 
 export EDITOR="${EDITOR:-vim}"
