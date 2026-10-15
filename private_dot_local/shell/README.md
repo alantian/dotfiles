@@ -23,6 +23,7 @@ This repo wires it as (`<layer>` expands to `os/<os>`, then `os/<distro>`, then 
 - `zprofile.sh`: `shared/<layer>.profile.sh` (login-only setup, e.g. `brew shellenv` on macOS)
 - `zshrc.sh`: `shared/interactive.sh` + `shared/aliases.sh` + `shared/<layer>.interactive.sh`
   then `zshrc.zsh` + `hooks.zsh` + `zsh/<layer>.zsh`
+  then `~/.zshrc.local` if present and not already loaded (see below)
 
 ### bash
 - **interactive login**: `~/.bash_profile` (which sources `~/.bashrc`)
@@ -58,6 +59,10 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
   form; in `.chezmoiignore`, never committed
 - `shared/os/<os|distro>.*`: OS- or distro-specific overrides (see Layers above)
 - `shared/hosts/<host>.*`: host-specific shared overrides
+- `~/.zshrc.local`: **machine-local zsh config, not in chezmoi**, loaded last by
+  `zshrc.sh`. It should start with a guard so a second load is a no-op (Arch's
+  `grml-zsh-config` sources it from `/etc/zsh/zshrc` *before* `~/.zshrc`):
+  `[[ -n ${_ZSHRC_LOCAL_LOADED-} ]] && return; _ZSHRC_LOCAL_LOADED=1`
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
 - `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)
 
