@@ -79,6 +79,13 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
   `~/.proto/.prototools` (source: `dot_proto/dot_prototools`) with explicit
   versions; `npm = "bundled"` means the npm shipped inside the pinned node.
   Nothing floats: a rerun of bootstrap installs exactly those versions.
+- **Python**: the global pin is the current 3.13.x; bootstrap also installs the
+  current 3.14.x (`PROTO_EXTRA_VERSIONS` in `bootstrap.sh`) so projects can use
+  it via their own `.prototools` or `uv run --python 3.14`. Both are updated by
+  hand. uv does not download interpreters of its own in bootstrap. `thefuck` is
+  no longer installed by bootstrap (archived upstream); the shell config only
+  enables its alias if the command exists, so install it by hand if wanted:
+  `uv tool install thefuck --python ~/.proto/shims/python`.
 - PATH order is `~/.proto/shims` before `~/.proto/bin`, so shims win over the
   backing binaries. `user_path_setup` in `shared/env.sh` builds this order with
   *forced* prepends, so calling it again later restores the order after
@@ -88,11 +95,12 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
   need them. Our shells always put proto shims first, so `node`, `npm`, `uv`,
   `python` resolve to proto's. System packages are unaffected: they call
   `/usr/bin/node` by absolute path. Never rely on the system copy for our tools.
-- npm global tools (gemini-cli, codex, pi) are installed by proto's npm into
-  the prefix from the managed `~/.npmrc` (`~/.npm-global`); bootstrap does this
-  in `install_npm_globals`. npm 11+ skips package install scripts for global
-  installs and warns; these three work regardless (their native parts are
-  prebuilt), so the warning can be ignored.
+- npm global tools (gemini-cli, codex, pi) are *not* part of bootstrap (they
+  are applications, not dotfiles). Install by hand with proto's npm into the
+  prefix from the managed `~/.npmrc` (`~/.npm-global`):
+  `npm install -g @google/gemini-cli @openai/codex @earendil-works/pi-coding-agent`.
+  npm 11+ skips package install scripts for global installs and warns; these
+  three work regardless (their native parts are prebuilt).
 
 ### Checking for updates
 ```

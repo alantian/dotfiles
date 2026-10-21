@@ -3,15 +3,22 @@
 ## Bootstrap
 
 ```bash
-curl https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh | bash
+bash <(curl -fsSL https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh)
 ```
+
+(Not `curl | bash`: steps that read stdin would swallow the script.) Needs curl
+and sudo; have a GitHub SSH key in place if the clone should be pushable.
+Rerunning is safe and idempotent. Afterwards, put secrets in `~/.env.local`.
 
 Bootstrap installs or updates core packages, ensures `zsh` is the default
 shell, applies the chezmoi-managed dotfiles (which carry the tool pins and the
 npm prefix), installs `proto` with `PROTO_HOME=~/.proto`, installs the pinned
-toolchain from `~/.proto/.prototools` (node, npm, pnpm, uv, python; explicit
-versions, nothing floats), installs the npm global tools, and then the
-interactive shell tooling. Rerunning it is reproducible.
+toolchain from `~/.proto/.prototools` (node, npm, pnpm, uv, python 3.13 as the
+default plus a 3.14 kept alongside; explicit versions, nothing floats, updated
+by hand), creates an empty `~/.env.local`, and then the interactive shell
+tooling (oh-my-posh, fzf, zoxide, zinit). Applications such as the npm AI CLIs
+are installed by hand afterwards; see `~/.local/shell/README.md`. Rerunning it
+is reproducible.
 
 ## One-off Setup of chezmoi
 

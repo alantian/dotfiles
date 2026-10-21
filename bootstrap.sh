@@ -2,7 +2,15 @@
 set -euo pipefail
 
 # Bootstrap script for alantian/dotfiles
-# Usage: curl https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh | bash
+# Usage (fresh host or rerun; idempotent):
+#   bash <(curl -fsSL https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh)
+# Not `curl ... | bash`: with the script on stdin, any step that reads stdin
+# (interactive zsh, brew) would swallow the rest of the script.
+# Prerequisites: curl, sudo (or root) for system packages; an SSH key for GitHub
+# if the dotfiles clone should be pushable (otherwise HTTPS, read-only).
+# Scope: only what the dotfiles themselves need (shell, prompt, fzf, zoxide,
+# zinit, chezmoi) plus the proto toolchain. Applications (npm globals such as
+# gemini-cli/codex, uv tools, editors) are installed by hand afterwards.
 
 # ---------------------------------------------------------------------------
 # Sudo helper
@@ -92,14 +100,15 @@ install_system_pkgs() {
       else
         echo "Homebrew already installed"
       fi
-      brew install git curl wget
+      brew install git curl wget </dev/null
       ;;
     ubuntu)
       $SUDO apt-get update -y
-      $SUDO apt-get install -y git curl wget zsh
+      $SUDO apt-get install -y git curl wget zsh ca-certificates xz-utils
       ;;
     arch)
-      $SUDO pacman -S --needed --noconfirm git curl wget zsh
+      # Full sync+upgrade first: a fresh image has a stale db and -S alone 404s.
+      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh
       ;;
   esac
 }
@@ -148,6 +157,10 @@ ensure_zsh_default() {
       chsh -s "$zsh_path"
       ;;
     ubuntu|arch)
+      if [ "$SKIP_SYSTEM_PKGS" = true ]; then
+        echo "WARNING: no sudo; cannot change the login shell. Run later: chsh -s $zsh_path"
+        return
+      fi
       # Use usermod to avoid interactive password prompt from chsh
       $SUDO usermod -s "$zsh_path" "$(id -un)"
       ;;
@@ -161,8 +174,19 @@ install_proto() {
   step "Installing/upgrading proto"
 
   if [ -x "$PROTO_HOME/bin/proto" ]; then
-    echo "proto already installed, upgrading..."
-    "$PROTO_HOME/bin/proto" upgrade || true
+    # proto itself is pinned in ~/.proto/.prototools (`proto = "x.y.z"`); only
+    # move when the installed version differs from the pin. Never float.
+    local pin have
+    pin="$(sed -n 's/^proto = "\(.*\)"/\1/p' "$PROTO_HOME/.prototools" 2>/dev/null || true)"
+    have="$("$PROTO_HOME/bin/proto" --version 2>/dev/null | awk '{print $2}')"
+    if [ -n "$pin" ] && [ "$pin" = "$have" ]; then
+      echo "proto $have already installed and matches the pin"
+    elif [ -n "$pin" ]; then
+      echo "proto $have installed, pin is $pin; upgrading to the pin..."
+      "$PROTO_HOME/bin/proto" upgrade "$pin" || true
+    else
+      echo "proto $have installed, no pin found; leaving as is"
+    fi
   else
     echo "Installing proto..."
     local proto_installer
@@ -193,23 +217,17 @@ install_proto_tools() {
   # npm, pnpm, uv, python). Nothing floats; rerunning bootstrap is reproducible.
   echo "  proto install --config-mode global   # all tools from $PROTO_HOME/.prototools"
   "$proto" install --config-mode global -y
+
+  # Extra, unpinned versions kept installed alongside the pins (Tian updates
+  # this list by hand, like the pins). The global `python` stays the pinned 3.13;
+  # a project can select 3.14 with its own .prototools or `uv run --python 3.14`.
+  local spec
+  for spec in "${PROTO_EXTRA_VERSIONS[@]}"; do
+    echo "  proto install ${spec%@*} ${spec#*@}"
+    "$proto" install "${spec%@*}" "${spec#*@}" -y
+  done
 }
-
-# ---------------------------------------------------------------------------
-# npm global tools (installed with proto's npm, into the ~/.npmrc prefix)
-# ---------------------------------------------------------------------------
-NPM_GLOBALS=(@google/gemini-cli @openai/codex @earendil-works/pi-coding-agent)
-
-install_npm_globals() {
-  step "Installing npm global tools: ${NPM_GLOBALS[*]}"
-
-  local npm="$PROTO_HOME/shims/npm"
-  if [ ! -x "$npm" ]; then
-    echo "ERROR: proto npm shim not found at $npm (run proto regen?)" >&2
-    exit 1
-  fi
-  "$npm" install -g "${NPM_GLOBALS[@]}"
-}
+PROTO_EXTRA_VERSIONS=(python@3.14.8)
 
 # ---------------------------------------------------------------------------
 # proto shims
@@ -224,24 +242,6 @@ regen_proto_shims() {
   fi
 
   "$proto" regen
-}
-
-# ---------------------------------------------------------------------------
-# python (via uv)
-# ---------------------------------------------------------------------------
-install_python() {
-  step "Installing Python via uv"
-
-  local proto="$PROTO_HOME/bin/proto"
-  local uv
-  uv="$("$proto" bin uv 2>/dev/null)" || true
-  if [ -z "$uv" ] || [ ! -x "$uv" ]; then
-    echo "ERROR: uv not found via proto bin uv" >&2
-    exit 1
-  fi
-
-  echo "  uv python install"
-  "$uv" python install
 }
 
 # ---------------------------------------------------------------------------
@@ -286,23 +286,6 @@ install_zoxide() {
 }
 
 # ---------------------------------------------------------------------------
-# thefuck
-# ---------------------------------------------------------------------------
-install_thefuck() {
-  step "Installing/upgrading thefuck"
-
-  local proto="$PROTO_HOME/bin/proto"
-  local uv
-  uv="$("$proto" bin uv 2>/dev/null)" || true
-  if [ -z "$uv" ] || [ ! -x "$uv" ]; then
-    echo "ERROR: uv not found via proto bin uv" >&2
-    exit 1
-  fi
-
-  "$uv" tool install thefuck --python 3.11
-}
-
-# ---------------------------------------------------------------------------
 # zinit
 # ---------------------------------------------------------------------------
 install_zinit() {
@@ -318,7 +301,7 @@ install_zinit() {
   echo "Running zsh interactively to install plugins..."
   # Intentional best-effort step: bootstrap keeps going if plugin hydration
   # fails, but we warn so the non-zero exit is not silent.
-  if ! zsh -i -c "exit"; then
+  if ! zsh -i -c "exit" </dev/null; then
     echo "WARNING: zinit/plugin bootstrap reported a non-zero exit status; continuing" >&2
   fi
 }
@@ -336,12 +319,40 @@ install_chezmoi() {
   fi
 
   if [ -d "$HOME/.local/share/chezmoi/.git" ]; then
-    echo "chezmoi repo already present, applying..."
-    "$chezmoi" apply
+    echo "chezmoi repo already present: pulling what other hosts pushed, then applying..."
+    "$chezmoi" update
   else
-    echo "Initialising chezmoi from alantian/dotfiles..."
-    "$chezmoi" init --apply alantian
+    # Prefer the SSH remote so later `chezmoi git -- push` works; fall back to
+    # HTTPS (public repo, read-only) when no GitHub key is available yet.
+    local repo="https://github.com/alantian/dotfiles.git"
+    if ssh -T -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new git@github.com 2>&1 | grep -q "successfully authenticated"; then
+      repo="git@github.com:alantian/dotfiles.git"
+    else
+      echo "WARNING: no GitHub SSH access; cloning over HTTPS. Pushes will not work until you run:"
+      echo "         chezmoi git -- remote set-url origin git@github.com:alantian/dotfiles.git"
+    fi
+    echo "Initialising chezmoi from $repo..."
+    "$chezmoi" init --apply "$repo"
   fi
+}
+
+# ---------------------------------------------------------------------------
+# ~/.env.local (host-local secrets; never in the dotfiles)
+# ---------------------------------------------------------------------------
+ensure_env_local() {
+  step "Ensuring ~/.env.local exists"
+  if [ -e "$HOME/.env.local" ]; then
+    echo "$HOME/.env.local present"
+    return
+  fi
+  umask 077
+  cat > "$HOME/.env.local" <<'EOT'
+# Host-local secrets and overrides, KEY=value, one per line. Sourced with
+# `set -a` by ~/.local/shell/shared/env.sh in every shell. Never committed
+# (it is in chezmoi's ignore list). Add API keys etc. here.
+EOT
+  umask 022
+  echo "created empty ~/.env.local (mode 600); add your API keys there"
 }
 
 # ---------------------------------------------------------------------------
@@ -365,9 +376,7 @@ main() {
   install_proto
   install_proto_tools
   regen_proto_shims
-  install_python
-  install_thefuck
-  install_npm_globals
+  ensure_env_local
 
   # Interactive shell and terminal tooling.
   install_oh_my_posh
@@ -388,9 +397,14 @@ main() {
   echo "  oh-my-posh: $("${HOME}/.local/bin/oh-my-posh" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  fzf:        $("${HOME}/.fzf/bin/fzf" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  zoxide:     $("${HOME}/.local/bin/zoxide" --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  thefuck:    $("${HOME}/.local/bin/thefuck" --version 2>&1 | head -1 || echo 'NOT FOUND')"
+  echo "  node:       $("${PROTO_HOME}/shims/node" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  npm:        $("${PROTO_HOME}/shims/npm" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  pnpm:       $("${PROTO_HOME}/shims/pnpm" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  uv:         $("${PROTO_HOME}/shims/uv" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  python:     $("${PROTO_HOME}/shims/python" --version 2>/dev/null || echo 'NOT FOUND')"
   echo
-  echo "Restart your shell (or open a new terminal) to pick up the new configuration."
+  echo "Open a new terminal (or run: exec zsh) to pick up the new configuration."
+  echo "Then put your secrets in ~/.env.local."
 }
 
 main "$@"
