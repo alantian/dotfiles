@@ -30,11 +30,11 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export PROTO_HOME="${PROTO_HOME:-$HOME/.proto}"
 
-## OS / distro tags for the os/ layer (shared/os/<tag>.*, zsh/os/, bash/os/).
+## OS / distro tags for the os/ layer (shared/os/<tag>.*, zsh/os/).
 ## SHELL_OS is darwin|linux|other; SHELL_DISTRO is the ID from /etc/os-release
-## on Linux (arch, ubuntu, ...) or empty. Fork-free: uses $OSTYPE (set by zsh
-## and bash) and a builtin read of /etc/os-release; falls back to uname only
-## if $OSTYPE is unset. Cost is ~10 microseconds.
+## on Linux (arch, ubuntu, ...) or empty. Fork-free: uses $OSTYPE (set by
+## zsh) and a builtin read of /etc/os-release; falls back to uname only if
+## $OSTYPE is unset (plain sh). Cost is ~10 microseconds.
 case "${OSTYPE:-$(uname -s)}" in
   darwin*|Darwin) SHELL_OS=darwin ;;
   linux*|Linux)   SHELL_OS=linux ;;

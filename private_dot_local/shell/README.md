@@ -1,6 +1,8 @@
-# ~/.local/shell (bash + zsh)
+# ~/.local/shell (zsh only)
 
 Single home for shell config. `$HOME` only contains **tiny shim dotfiles** that source into here.
+**zsh is the only supported shell** (since 2026-10-21; bash support was dropped, bootstrap
+refuses to finish unless zsh is the login shell). `/bin/sh` scripts are unaffected.
 
 ## Before changing anything
 These dotfiles are used on several hosts and any of them may have pushed. Run
@@ -11,8 +13,6 @@ Editing on a stale checkout produces merge conflicts in `~/.local/share/chezmoi`
 - `~/.zshenv` → `~/.local/shell/zsh/zshenv.sh`
 - `~/.zprofile` → `~/.local/shell/zsh/zprofile.sh`
 - `~/.zshrc` → `~/.local/shell/zsh/zshrc.sh`
-- `~/.bash_profile` → `~/.local/shell/bash/bash_profile.sh`
-- `~/.bashrc` → `~/.local/shell/bash/bashrc.sh`
 
 (Each shim should be a single line: `. "$HOME/.local/shell/…"`)
 
@@ -23,32 +23,23 @@ Editing on a stale checkout produces merge conflicts in `~/.local/share/chezmoi`
 - **interactive non-login**: `~/.zshenv` → `~/.zshrc`
 - **non-interactive (`zsh -c`)**: `~/.zshenv` only
 
-This repo wires it as (`<layer>` expands to `os/<os>`, then `os/<distro>`, then `hosts/<host>`, each only if the file exists):
+Wired as (`<layer>` expands to `os/<os>`, then `os/<distro>`, then `hosts/<host>`, each only if the file exists):
 - `zshenv.sh`: `shared/env.sh` + `shared/<layer>.env.sh`
 - `zprofile.sh`: `shared/<layer>.profile.sh` (login-only setup, e.g. `brew shellenv` on macOS)
 - `zshrc.sh`: `shared/interactive.sh` + `shared/aliases.sh` + `shared/<layer>.interactive.sh`
   then `zshrc.zsh` + `hooks.zsh` + `zsh/<layer>.zsh`
   then `~/.zshrc.local` if present and not already loaded (see below)
 
-### bash
-- **interactive login**: `~/.bash_profile` (which sources `~/.bashrc`)
-- **interactive non-login**: `~/.bashrc`
-- **non-interactive scripts**: does *not* read these by default
-
-This repo wires it as (same `<layer>` expansion as zsh):
-- `bash_profile.sh`: sources `bashrc.sh` + `shared/<layer>.profile.sh`
-- `bashrc.sh`: `shared/env.sh` + `shared/<layer>.env.sh`
-  then `shared/interactive.sh` + `shared/aliases.sh` + `shared/<layer>.interactive.sh`
-  then `bashrc.bash` + `hooks.bash` + `bash/<layer>.bash`
-
 ### Layers: shared → os → distro → host
+`shared/*.sh` stay POSIX sh (no zsh-isms) so they can also be sourced by `sh`
+scripts and stay easy to read; everything zsh-specific lives under `zsh/`.
 `shared/env.sh` exports `SHELL_OS` (`darwin`, `linux`, `other`, from `$OSTYPE`, `uname -s` only as fallback) and
 `SHELL_DISTRO` (the `ID` from `/etc/os-release` on Linux, e.g. `arch`, `ubuntu`; empty
 elsewhere). Later layers win. Put a thing in the narrowest layer that is still true:
 - `shared/*`: true everywhere; guard on tool presence (`command -v`), never on OS
 - `shared/os/darwin.*`, `zsh/os/darwin.zsh`: macOS only (Homebrew paths and shellenv, Tailscale app alias, gcloud from Homebrew)
 - `shared/os/arch.*`: Arch Linux only (`yay` wrapper)
-- `shared/hosts/<host>.*`, `zsh/hosts/<host>.zsh`, `bash/hosts/<host>.bash`: one machine only
+- `shared/hosts/<host>.*`, `zsh/hosts/<host>.zsh`: one machine only
 
 
 ## What lives where
@@ -56,8 +47,7 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
   XDG variables and `PROTO_HOME`; at the end it sources `~/.env` then
   `~/.env.local` with `set -a`, so every shell (including non-interactive)
   gets them
-- `shared/interactive.sh`: interactive-only env tweaks + small helpers; zsh-only
-  helpers must be guarded there
+- `shared/interactive.sh`: interactive-only env tweaks + small helpers
 - `shared/aliases.sh`: shared aliases/functions
 - `~/.env`: shared non-secret defaults in `KEY=value` form (optional)
 - `~/.env.local`: **local-only secrets and host overrides in $HOME**, `KEY=value`
@@ -71,7 +61,7 @@ elsewhere). Later layers win. Put a thing in the narrowest layer that is still t
   is a no-op (Arch's `grml-zsh-config` sources it from `/etc/zsh/zshrc`
   *before* `~/.zshrc`; with the guard that early load does nothing).
 - `zsh/plugins.zsh`: zinit bootstrap + plugin list
-- `zsh/hooks.zsh` / `bash/hooks.bash`: tool hooks (fzf, etc.)
+- `zsh/hooks.zsh`: tool hooks (fzf, zoxide, uv completions, oh-my-posh)
 
 ## Toolchain ownership (proto)
 - **proto owns node, npm, pnpm, uv and python for our use, on every OS.**
@@ -113,10 +103,9 @@ proto versions node                   # all versions available for one tool
    `dot_proto/dot_prototools` in the source and `chezmoi git -- commit`.
 2. `chezmoi apply`, then `proto install --config-mode global` (installs the
    new pins; without the flag proto only looks for a project-level
-   `.prototools`), then `proto regen` if a shim is missing. Then `rehash`
-   (zsh) / `hash -r` (bash) or open a new shell: zsh caches PATH directory
-   listings, so shims created in the current session look "not found" until
-   then.
+   `.prototools`), then `proto regen` if a shim is missing. Then `rehash` or
+   open a new shell: zsh caches PATH directory listings, so shims created in
+   the current session look "not found" until then.
 3. If node changed: `npm install -g @google/gemini-cli @openai/codex @earendil-works/pi-coding-agent`
    (their native parts are prebuilt per node major; reinstalling refreshes them).
 4. Remove the old version explicitly: `proto uninstall node 26.12.0`.
@@ -150,8 +139,8 @@ with `chezmoi add ~/.proto/.prototools` so the dotfiles follow.
 - Do not `brew install` node, uv, python or pnpm for our use; if a brew formula
   pulls one in as a dependency, that is fine, it is shadowed.
 
-## When a tool installer edits ~/.zshrc or ~/.bashrc
-Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `~/.bashrc`, etc.
+## When a tool installer edits ~/.zshrc or ~/.zprofile
+Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `~/.zshenv`.
 
 **Policy:** keep those files as tiny shims only.
 
@@ -159,24 +148,23 @@ Some installers append PATH lines/hooks directly to `~/.zshrc`, `~/.zprofile`, `
 1) Open the modified file in `$HOME` (e.g. `~/.zshrc`).
 2) **Move the added lines** into the right place under `~/.local/shell/`:
    - PATH exports → `shared/env.sh` (or `shared/os/<os>.env.sh` / `shared/hosts/<host>.env.sh` if OS- or host-only)
-   - shell hooks / `eval ...` / `source <(...)` → `zsh/hooks.zsh` or `bash/hooks.bash`
-   - login-only changes (should apply once per session) → `zsh/zprofile.sh` or `bash/bash_profile.sh`
-   - aliases/functions → `shared/aliases.sh` (portable) or `zshrc.zsh` / `bashrc.bash` (shell-only)
+   - shell hooks / `eval ...` / `source <(...)` → `zsh/hooks.zsh`
+   - login-only changes (should apply once per session) → `zsh/zprofile.sh` or `shared/os/<os>.profile.sh`
+   - aliases/functions → `shared/aliases.sh` (POSIX, no zsh-isms) or `zshrc.zsh` (zsh-only)
 3) Restore the `$HOME` file back to a 1-line shim:
    - `~/.zshrc` should only source `~/.local/shell/zsh/zshrc.sh`
-   - `~/.bashrc` should only source `~/.local/shell/bash/bashrc.sh`
 4) (If using chezmoi) re-add/apply so the shim stays enforced.
 
 ### Quick “where should this line go?” cheatsheet
 - `export PATH=...` / `path=...` → `shared/env.sh`
 
-- `source <(fzf --zsh)` / completions → `zsh/hooks.zsh` or `bash/hooks.bash`
+- `source <(fzf --zsh)` / completions → `zsh/hooks.zsh`
 - tool init like `eval "$(/opt/homebrew/bin/brew shellenv)"` → it already lives
   in `shared/os/darwin.profile.sh`; OS-specific login setup goes in
   `shared/os/<os>.profile.sh`, host-specific in `shared/hosts/<host>.profile.sh`
 
 ## Debug
-- `command -v zsh; command -v bash`
+- `command -v zsh; echo $SHELL; getent passwd $USER | cut -d: -f7` (must all be zsh)
 - `printf '%s\n' "$PROTO_HOME"; command -v proto; command -v node; command -v npm; command -v uv`
 - zsh clean start: `zsh -f`
 

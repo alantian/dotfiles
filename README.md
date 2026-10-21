@@ -1,5 +1,8 @@
 # dotfiles Managed by chezmoi
 
+zsh only. Bash is not configured by these dotfiles (support dropped 2026-10-21),
+and `bootstrap.sh` refuses to finish unless zsh is the login shell.
+
 ## Bootstrap
 
 ```bash
@@ -15,8 +18,8 @@ shell, applies the chezmoi-managed dotfiles (which carry the tool pins and the
 npm prefix), installs `proto` with `PROTO_HOME=~/.proto`, installs the pinned
 toolchain from `~/.proto/.prototools` (node, npm, pnpm, uv, python 3.13 as the
 default plus a 3.14 kept alongside; explicit versions, nothing floats, updated
-by hand), creates an empty `~/.env.local`, and then the interactive shell
-tooling (oh-my-posh, fzf, zoxide, zinit). Applications such as the npm AI CLIs
+by hand), creates an empty `~/.env.local`, and then the zsh tooling
+(oh-my-posh, fzf, zoxide, zinit). Applications such as the npm AI CLIs
 are installed by hand afterwards; see `~/.local/shell/README.md`. Rerunning it
 is reproducible.
 

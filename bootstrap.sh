@@ -8,8 +8,9 @@ set -euo pipefail
 # (interactive zsh, brew) would swallow the rest of the script.
 # Prerequisites: curl, sudo (or root) for system packages; an SSH key for GitHub
 # if the dotfiles clone should be pushable (otherwise HTTPS, read-only).
-# Scope: only what the dotfiles themselves need (shell, prompt, fzf, zoxide,
-# zinit, chezmoi) plus the proto toolchain. Applications (npm globals such as
+# Scope: only what the dotfiles themselves need (zsh, prompt, fzf, zoxide,
+# zinit, chezmoi) plus the proto toolchain. zsh is the only supported shell;
+# bootstrap aborts if zsh cannot be made the login shell. Applications (npm globals such as
 # gemini-cli/codex, uv tools, editors) are installed by hand afterwards.
 
 # ---------------------------------------------------------------------------
@@ -114,57 +115,61 @@ install_system_pkgs() {
 }
 
 # ---------------------------------------------------------------------------
-# zsh as default shell
+# zsh as default shell (REQUIRED: these dotfiles support zsh only)
 # ---------------------------------------------------------------------------
+login_shell() {  # prints the current login shell of this user, or nothing
+  case "$OS_TYPE" in
+    macos) dscl . -read "/Users/$(id -un)" UserShell 2>/dev/null | awk '{print $2}' ;;
+    *)     getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7 ;;
+  esac
+}
+
 ensure_zsh_default() {
-  step "Ensuring zsh is the default shell"
+  step "Ensuring zsh is the login shell (required)"
 
   local zsh_path current_shell
   zsh_path="$(command -v zsh 2>/dev/null || true)"
 
   if [ -z "$zsh_path" ]; then
-    echo "WARNING: zsh not found on PATH, skipping chsh"
+    echo "ERROR: zsh is not installed and could not be installed. These dotfiles support zsh only." >&2
+    echo "       Install zsh (e.g. apt/pacman/brew install zsh) and rerun." >&2
+    exit 1
+  fi
+
+  current_shell="$(login_shell)"
+  [ -n "$current_shell" ] || current_shell="${SHELL:-}"
+
+  if [ "${current_shell##*/}" = "zsh" ]; then
+    echo "zsh is already the login shell ($current_shell)"
     return
   fi
 
-  current_shell=""
-  case "$OS_TYPE" in
-    macos)
-      if command -v dscl >/dev/null 2>&1; then
-        current_shell="$(dscl . -read "/Users/$(id -un)" UserShell 2>/dev/null | awk '{print $2}')"
-      fi
-      ;;
-    ubuntu|arch)
-      if command -v getent >/dev/null 2>&1; then
-        current_shell="$(getent passwd "$(id -un)" | cut -d: -f7)"
-      fi
-      ;;
-  esac
-
-  if [ -z "$current_shell" ]; then
-    current_shell="${SHELL:-}"
-  fi
-
-  if [ -n "$current_shell" ] && [ "${current_shell##*/}" = "zsh" ]; then
-    echo "zsh is already the default shell ($current_shell)"
-    return
-  fi
-
-  echo "Setting default shell to $zsh_path"
+  echo "Login shell is '${current_shell:-unknown}'; setting it to $zsh_path"
   case "$OS_TYPE" in
     macos)
       # /bin/zsh is already in /etc/shells on macOS
-      chsh -s "$zsh_path"
+      chsh -s "$zsh_path" </dev/null || true
       ;;
     ubuntu|arch)
       if [ "$SKIP_SYSTEM_PKGS" = true ]; then
-        echo "WARNING: no sudo; cannot change the login shell. Run later: chsh -s $zsh_path"
-        return
+        # No sudo: chsh needs the user's password; it cannot be done unattended.
+        echo "ERROR: cannot change the login shell without sudo." >&2
+        echo "       Run: chsh -s $zsh_path   (enter your password), then rerun bootstrap." >&2
+        exit 1
       fi
-      # Use usermod to avoid interactive password prompt from chsh
-      $SUDO usermod -s "$zsh_path" "$(id -un)"
+      # usermod avoids chsh's interactive password prompt
+      $SUDO usermod -s "$zsh_path" "$(id -un)" || true
       ;;
   esac
+
+  # Verify, do not assume. The dotfiles only make sense under zsh.
+  current_shell="$(login_shell)"
+  if [ "${current_shell##*/}" != "zsh" ]; then
+    echo "ERROR: login shell is still '${current_shell:-unknown}', not zsh. Aborting." >&2
+    echo "       Set it by hand (chsh -s $zsh_path) and rerun bootstrap." >&2
+    exit 1
+  fi
+  echo "Login shell is now $current_shell"
 }
 
 # ---------------------------------------------------------------------------
@@ -390,6 +395,7 @@ main() {
   echo "========================================"
   echo
   echo "Verification:"
+  echo "  login shell: $(login_shell)"
   echo "  zsh:      $(zsh --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  git:      $(git --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  proto:    $("${PROTO_HOME}/bin/proto" --version 2>/dev/null || echo 'NOT FOUND')"
