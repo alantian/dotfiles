@@ -1,6 +1,6 @@
 # Global proto pins, managed by chezmoi (source: dot_proto/dot_prototools).
 # Explicit versions on purpose: nothing floats. To update, see
-# ~/.local/shell/README.md, "Toolchain ownership".
+# ~/.local/shell/README.md, section "proto".
 node = "26.12.0"
 npm = "bundled"
 pnpm = "10.2.0"

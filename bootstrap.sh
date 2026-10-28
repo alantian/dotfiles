@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage (fresh host or rerun; idempotent):
 #   bash <(curl -fsSL https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh)
 # Not `curl ... | bash`: with the script on stdin, any step that reads stdin
-# (interactive zsh, brew) would swallow the rest of the script.
+# (the Homebrew installer, sudo password prompts) would swallow the rest of the script.
 # Prerequisites: curl, sudo (or root) for system packages; an SSH key for GitHub
 # if the dotfiles clone should be pushable (otherwise HTTPS, read-only).
 # Scope: only what the dotfiles themselves need (zsh, prompt, fzf, zoxide,
@@ -147,8 +147,9 @@ ensure_zsh_default() {
   echo "Login shell is '${current_shell:-unknown}'; setting it to $zsh_path"
   case "$OS_TYPE" in
     macos)
-      # /bin/zsh is already in /etc/shells on macOS
-      chsh -s "$zsh_path" </dev/null || true
+      # /bin/zsh is already in /etc/shells on macOS. chsh as the user prompts
+      # for the password via PAM; as root it does not.
+      $SUDO chsh -s "$zsh_path" "$(id -un)" || true
       ;;
     ubuntu|arch)
       if [ "$SKIP_SYSTEM_PKGS" = true ]; then
@@ -178,27 +179,29 @@ ensure_zsh_default() {
 install_proto() {
   step "Installing/upgrading proto"
 
-  if [ -x "$PROTO_HOME/bin/proto" ]; then
-    # proto itself is pinned in ~/.proto/.prototools (`proto = "x.y.z"`); only
-    # move when the installed version differs from the pin. Never float.
-    local pin have
-    pin="$(sed -n 's/^proto = "\(.*\)"/\1/p' "$PROTO_HOME/.prototools" 2>/dev/null || true)"
-    have="$("$PROTO_HOME/bin/proto" --version 2>/dev/null | awk '{print $2}')"
-    if [ -n "$pin" ] && [ "$pin" = "$have" ]; then
-      echo "proto $have already installed and matches the pin"
-    elif [ -n "$pin" ]; then
-      echo "proto $have installed, pin is $pin; upgrading to the pin..."
-      "$PROTO_HOME/bin/proto" upgrade "$pin" || true
-    else
-      echo "proto $have installed, no pin found; leaving as is"
-    fi
-  else
-    echo "Installing proto..."
+  # proto itself is pinned in ~/.proto/.prototools (`proto = "x.y.z"`, applied
+  # by chezmoi before this step). Install the pin when proto is missing, move
+  # to the pin when the installed version differs. Never float.
+  local proto="$PROTO_HOME/bin/proto" pin have
+  pin="$(sed -n 's/^proto = "\(.*\)"/\1/p' "$PROTO_HOME/.prototools" 2>/dev/null || true)"
+
+  if [ ! -x "$proto" ]; then
+    echo "Installing proto ${pin:-latest}..."
     local proto_installer
     proto_installer="$(mktemp)"
     curl -fsSL https://moonrepo.dev/install/proto.sh -o "$proto_installer"
-    bash "$proto_installer" --no-profile --yes
+    bash "$proto_installer" ${pin:+"$pin"} --no-profile --yes
     rm -f "$proto_installer"
+  fi
+
+  have="$("$proto" --version 2>/dev/null | awk '{print $2}')"
+  if [ -z "$pin" ]; then
+    echo "proto $have installed, no pin found; leaving as is"
+  elif [ "$pin" = "$have" ]; then
+    echo "proto $have installed and matches the pin"
+  else
+    echo "proto $have installed, pin is $pin; moving to the pin..."
+    "$proto" upgrade "$pin"
   fi
 }
 
@@ -227,9 +230,9 @@ install_proto_tools() {
   # this list by hand, like the pins). The global `python` stays the pinned 3.13;
   # a project can select 3.14 with its own .prototools or `uv run --python 3.14`.
   local spec
-  for spec in "${PROTO_EXTRA_VERSIONS[@]}"; do
+  for spec in ${PROTO_EXTRA_VERSIONS[@]+"${PROTO_EXTRA_VERSIONS[@]}"}; do  # safe when empty on bash 3.2
     echo "  proto install ${spec%@*} ${spec#*@}"
-    "$proto" install "${spec%@*}" "${spec#*@}" -y
+    "$proto" install --config-mode global "${spec%@*}" "${spec#*@}" -y
   done
 }
 PROTO_EXTRA_VERSIONS=(python@3.14.8)
@@ -246,7 +249,7 @@ regen_proto_shims() {
     exit 1
   fi
 
-  "$proto" regen
+  "$proto" regen --config-mode global
 }
 
 # ---------------------------------------------------------------------------
@@ -259,7 +262,7 @@ install_oh_my_posh() {
     "$HOME/.local/bin/oh-my-posh" upgrade
   else
     echo "Installing oh-my-posh..."
-    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
+    curl -fsSL https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
   fi
 }
 
@@ -282,7 +285,7 @@ install_fzf() {
 # zoxide
 # ---------------------------------------------------------------------------
 install_zoxide() {
-  step "Installing/upgrading zoxide"
+  step "Installing zoxide"
   if command -v zoxide >/dev/null 2>&1; then
     echo "zoxide already installed ($(zoxide --version 2>/dev/null || echo 'version unknown'))"
     return
@@ -352,13 +355,12 @@ ensure_local_files() {
   if [ -e "$HOME/.env.local" ]; then
     echo "$HOME/.env.local present, left as is"
   else
-    umask 077
-    cat > "$HOME/.env.local" <<'EOT'
+    ( umask 077; cat > "$HOME/.env.local" <<'EOT'
 # Host-local secrets and overrides, KEY=value, one per line. Sourced with
 # `set -a` by ~/.local/shell/env.zsh in every shell. Never committed
 # (it is in chezmoi's ignore list). Add API keys etc. here.
 EOT
-    umask 022
+    )
     echo "created empty ~/.env.local (mode 600); add your API keys there"
   fi
 
@@ -415,13 +417,13 @@ main() {
   echo
   echo "Verification:"
   echo "  login shell: $(login_shell)"
-  echo "  zsh:      $(zsh --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  git:      $(git --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  proto:    $("${PROTO_HOME}/bin/proto" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  zsh:        $(zsh --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  git:        $(git --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  proto:      $("${PROTO_HOME}/bin/proto" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  chezmoi:    $("${HOME}/.local/bin/chezmoi" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  oh-my-posh: $("${HOME}/.local/bin/oh-my-posh" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  fzf:        $("${HOME}/.fzf/bin/fzf" --version 2>/dev/null || echo 'NOT FOUND')"
-  echo "  zoxide:     $("${HOME}/.local/bin/zoxide" --version 2>/dev/null || echo 'NOT FOUND')"
+  echo "  zoxide:     $(zoxide --version 2>/dev/null || "${HOME}/.local/bin/zoxide" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  node:       $("${PROTO_HOME}/shims/node" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  npm:        $("${PROTO_HOME}/shims/npm" --version 2>/dev/null || echo 'NOT FOUND')"
   echo "  pnpm:       $("${PROTO_HOME}/shims/pnpm" --version 2>/dev/null || echo 'NOT FOUND')"

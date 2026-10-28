@@ -4,10 +4,12 @@ if [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ] \
   alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 fi
 
-# macOS: Google Cloud SDK from Homebrew
-if [[ -r /opt/homebrew/share/google-cloud-sdk/path.zsh.inc ]]; then
-  source /opt/homebrew/share/google-cloud-sdk/path.zsh.inc
+# macOS: Google Cloud SDK from Homebrew (Apple Silicon or Intel prefix)
+_hb="${HOMEBREW_PREFIX:-/opt/homebrew}"
+if [[ -r "$_hb/share/google-cloud-sdk/path.zsh.inc" ]]; then
+  source "$_hb/share/google-cloud-sdk/path.zsh.inc"
 fi
-if [[ -r /opt/homebrew/share/google-cloud-sdk/completion.zsh.inc ]]; then
-  source /opt/homebrew/share/google-cloud-sdk/completion.zsh.inc
+if [[ -r "$_hb/share/google-cloud-sdk/completion.zsh.inc" ]]; then
+  source "$_hb/share/google-cloud-sdk/completion.zsh.inc"
 fi
+unset _hb

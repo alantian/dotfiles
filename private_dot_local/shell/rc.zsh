@@ -7,7 +7,7 @@ export LESSHISTFILE="-"
 
 mkcd() { mkdir -p "$1" && cd "$1" || return; }
 
-if [ -n "${ZSH_VERSION:-}" ] && command -v thefuck >/dev/null 2>&1; then
+if command -v thefuck >/dev/null 2>&1; then
   # This is the output of:
   #    eval "$(thefuck --alias)"
   # Update as they are changed.
@@ -51,10 +51,12 @@ HISTSIZE=1000000
 setopt HIST_IGNORE_ALL_DUPS
 setopt SHARE_HISTORY
 
-# zsh-history-substring-search config (zsh-only, interactive)
+[ -r "$HOME/.local/shell/hooks.zsh" ] && . "$HOME/.local/shell/hooks.zsh"
+
+# zsh-history-substring-search config; must come after hooks.zsh loads the plugin
 if (( $+functions[history-substring-search-up] )); then
-  bindkey "$terminfo[kcuu1]" history-substring-search-up
-  bindkey "$terminfo[kcud1]" history-substring-search-down
+  [[ -n $terminfo[kcuu1] ]] && bindkey "$terminfo[kcuu1]" history-substring-search-up
+  [[ -n $terminfo[kcud1] ]] && bindkey "$terminfo[kcud1]" history-substring-search-down
 
   bindkey -M emacs '^P' history-substring-search-up
   bindkey -M emacs '^N' history-substring-search-down
@@ -66,8 +68,6 @@ if (( $+functions[history-substring-search-up] )); then
   export HISTORY_SUBSTRING_SEARCH_FUZZY=1
 fi
 
-
-[ -r "$HOME/.local/shell/hooks.zsh" ] && . "$HOME/.local/shell/hooks.zsh"
 for _l in "os/$SHELL_OS" "os/$SHELL_DISTRO" "hosts/${HOST%%.*}"; do
   [ -r "$HOME/.local/shell/$_l.rc.zsh" ] && . "$HOME/.local/shell/$_l.rc.zsh"
 done

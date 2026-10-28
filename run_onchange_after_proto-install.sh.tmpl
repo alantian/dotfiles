@@ -18,4 +18,4 @@ if [ -n "$pin" ] && [ "$pin" != "$have" ]; then
 fi
 echo "==> proto install --config-mode global"
 "$PROTO" install --config-mode global -y
-"$PROTO" regen
+"$PROTO" regen --config-mode global

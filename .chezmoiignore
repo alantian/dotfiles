@@ -1,5 +1,3 @@
-.config/alacritty/themes/.git/**
-.config/alacritty/themes/images/**
 README.md
 .env.local
 bootstrap.sh

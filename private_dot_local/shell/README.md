@@ -10,17 +10,22 @@ Before editing: `chezmoi git pull && chezmoi diff && chezmoi apply`. After: `che
 |---|---|---|
 | `.zshenv` | `env.zsh` | PATH (`user_path_setup`), exports, `SHELL_OS`/`SHELL_DISTRO`, `~/.env`, `~/.env.local` |
 | `.zprofile` | `profile.zsh` | login-only (macOS `brew shellenv`) |
-| `.zshrc` | `rc.zsh` | aliases, options, keys; then `hooks.zsh` (zinit, fzf, zoxide, uv, oh-my-posh); then `~/.zshrc.local` |
+| `.zshrc` | `rc.zsh` | aliases, options, keys; then `hooks.zsh` (`plugins.zsh` = zinit plugins; compinit, uv, zoxide, fzf, oh-my-posh); then the layers; then `~/.zshrc.local` |
 
 Layers, sourced after the base file of the same stage if present, later wins:
 `os/<os>.<stage>.zsh`, `os/<distro>.<stage>.zsh`, `hosts/<host>.<stage>.zsh`,
-stage = `env` | `profile` | `rc`. Shared code guards on `command -v`, not on OS.
+stage = `env` | `profile` | `rc`; `<host>` is the hostname up to the first dot,
+`<distro>` is empty off Linux. Shared code guards on `command -v`, not on OS.
+
+`.chezmoiremove` deletes `~/.bashrc`, `~/.bash_profile` and the old
+`~/.local/shell/{bash,shared,zsh}` on every apply.
 
 Not in chezmoi: `~/.env.local` (secrets, `KEY=value`), `~/.zshrc.local`
 (host-only zsh; first line `[[ -n ${_ZSHRC_LOCAL_FROM_DOTFILES-} ]] || return`).
 
-Installer wrote into `~/.zshrc`? Move the lines: PATH → `env.zsh`, hooks →
-`hooks.zsh`, login-only → `os/<os>.profile.zsh`, aliases → `rc.zsh`. Then `chezmoi apply`.
+Installer wrote into `~/.zshrc`? Move the lines with `chezmoi edit`: PATH →
+`env.zsh`, hooks → `hooks.zsh`, plugins → `plugins.zsh`, login-only →
+`os/<os>.profile.zsh`, aliases → `rc.zsh`. Then `chezmoi apply` restores the shim.
 
 ## proto
 
@@ -28,8 +33,6 @@ Pins: `~/.proto/.prototools` (chezmoi-managed, identical on every host). The pin
 is the default version; other installed versions coexist and are picked by a
 project `.prototools`, `PROTO_NODE_VERSION=x node` or `uv run --python x`.
 `python3` is not shimmed.
-
-Versions below are examples and will be stale; find the current ones first.
 
 Install a new tool version and pin it (on one host):
 
