@@ -6,7 +6,7 @@ npm = "bundled"
 pnpm = "10.2.0"
 uv = "0.13.1"
 python = "3.13.16"
-proto = "0.55.3"
+proto = "0.63.2"
 
 [settings]
 auto-install = true
