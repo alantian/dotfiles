@@ -226,7 +226,7 @@ install_proto_tools() {
   echo "  proto install --config-mode global   # all tools from $PROTO_HOME/.prototools"
   "$proto" install --config-mode global -y
 
-  # Extra, unpinned versions kept installed alongside the pins (Tian updates
+  # Extra, unpinned versions kept installed alongside the pins (the owner updates
   # this list by hand, like the pins). The global `python` stays the pinned 3.13;
   # a project can select 3.14 with its own .prototools or `uv run --python 3.14`.
   local spec
