@@ -1,3 +1,5 @@
 .bashrc
 .bash_profile
 .local/shell/bash
+.local/shell/shared
+.local/shell/zsh

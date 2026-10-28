@@ -1,4 +1,4 @@
-# Shared, non-secret environment. Keep POSIX-ish and fast.
+# Environment for every zsh (sourced by ~/.zshenv). Fast, no aliases, no secrets.
 
 path_prepend() {
   [ -d "$1" ] || return 0
@@ -30,11 +30,11 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export PROTO_HOME="${PROTO_HOME:-$HOME/.proto}"
 
-## OS / distro tags for the os/ layer (shared/os/<tag>.*, zsh/os/).
+## OS / distro tags for the os/ layer (os/<tag>.{env,profile,rc}.zsh).
 ## SHELL_OS is darwin|linux|other; SHELL_DISTRO is the ID from /etc/os-release
 ## on Linux (arch, ubuntu, ...) or empty. Fork-free: uses $OSTYPE (set by
 ## zsh) and a builtin read of /etc/os-release; falls back to uname only if
-## $OSTYPE is unset (plain sh). Cost is ~10 microseconds.
+## $OSTYPE is unset. Cost is ~10 microseconds.
 case "${OSTYPE:-$(uname -s)}" in
   darwin*|Darwin) SHELL_OS=darwin ;;
   linux*|Linux)   SHELL_OS=linux ;;
@@ -85,3 +85,9 @@ for f in "$HOME/.env" "$HOME/.env.local"; do
   fi
 done
 unset f
+
+## Layers: os/<os>, os/<distro>, hosts/<host>; later wins.
+for _l in "os/$SHELL_OS" "os/$SHELL_DISTRO" "hosts/${HOST%%.*}"; do
+  [ -r "$HOME/.local/shell/$_l.env.zsh" ] && . "$HOME/.local/shell/$_l.env.zsh"
+done
+unset _l

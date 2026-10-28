@@ -355,7 +355,7 @@ ensure_local_files() {
     umask 077
     cat > "$HOME/.env.local" <<'EOT'
 # Host-local secrets and overrides, KEY=value, one per line. Sourced with
-# `set -a` by ~/.local/shell/shared/env.sh in every shell. Never committed
+# `set -a` by ~/.local/shell/env.zsh in every shell. Never committed
 # (it is in chezmoi's ignore list). Add API keys etc. here.
 EOT
     umask 022
@@ -367,7 +367,7 @@ EOT
   else
     cat > "$HOME/.zshrc.local" <<'EOT'
 # Host-local zsh config, outside chezmoi (it is in the ignore list). Loaded
-# last by ~/.local/shell/zsh/zshrc.sh, after the shared/OS/host layers. The
+# last by ~/.local/shell/rc.zsh, after the os/host layers. The
 # guard below makes any other loader (e.g. Arch's grml /etc/zsh/zshrc, which
 # sources this file early) a no-op. Keep the file idempotent.
 [[ -n ${_ZSHRC_LOCAL_FROM_DOTFILES-} ]] || return

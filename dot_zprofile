@@ -1,1 +1,1 @@
-. "$HOME/.local/shell/zsh/zprofile.sh"
+. "$HOME/.local/shell/profile.zsh"

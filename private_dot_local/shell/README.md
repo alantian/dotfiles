@@ -4,40 +4,40 @@ All shell config lives here. The files in `$HOME` (`.zshenv`, `.zprofile`,
 `.zshrc`) are one-line shims that source into it. zsh only; `/bin/sh` scripts
 are unaffected.
 
-Run `chezmoi git pull`, `chezmoi diff`, `chezmoi apply` before editing and `chezmoi git -- push` after.
+Run `chezmoi git pull`, `chezmoi diff`, `chezmoi apply` before editing and
+`chezmoi git -- push` after.
 
 ## Source order
 
 - login: `.zshenv` → `.zprofile` → `.zshrc`; non-login: `.zshenv` → `.zshrc`;
   `zsh -c`: `.zshenv` only.
-- `zshenv.sh`: `shared/env.sh`, then `shared/<layer>.env.sh`
-- `zprofile.sh`: `shared/<layer>.profile.sh`
-- `zshrc.sh`: `shared/interactive.sh`, `shared/aliases.sh`,
-  `shared/<layer>.interactive.sh`, `zsh/zshrc.zsh`, `zsh/hooks.zsh`,
-  `zsh/<layer>.zsh`, then `~/.zshrc.local`
-- `<layer>` = `os/<os>`, `os/<distro>`, `hosts/<host>`, each if present, later
-  wins. `SHELL_OS` (`darwin`, `linux`) and `SHELL_DISTRO` (`arch`, `ubuntu`, ...)
-  come from `shared/env.sh`.
+- `.zshenv` → `env.zsh`: PATH (`user_path_setup`, forced prepends, so it can
+  be re-run after Homebrew or macOS `path_helper` reorder PATH), exports,
+  `SHELL_OS` (`darwin`, `linux`) and `SHELL_DISTRO` (`arch`, `ubuntu`, ...),
+  then `~/.env` and `~/.env.local` with `set -a`; then the `env` layers.
+- `.zprofile` → `profile.zsh`: only the `profile` layers (macOS: `brew
+  shellenv`, PATH re-assert).
+- `.zshrc` → `rc.zsh`: interactive env, aliases, zsh options and keys, then
+  `hooks.zsh` (sources `plugins.zsh`: zinit and plugins; fzf, zoxide, uv
+  completions, oh-my-posh), then the `rc` layers, then `~/.zshrc.local`.
+- Layers, each sourced if present, later wins: `os/<os>.<stage>.zsh`,
+  `os/<distro>.<stage>.zsh`, `hosts/<host>.<stage>.zsh`, with `<stage>` one of
+  `env`, `profile`, `rc`. Today: `os/darwin.{env,profile,rc}.zsh` (Homebrew,
+  Tailscale app, gcloud), `os/arch.rc.zsh` (`yay` wrapper).
 
 ## Where things go
 
-- `shared/*.sh`: POSIX sh, true everywhere; guard on `command -v`, not on OS.
-  `env.sh` builds PATH (`user_path_setup`, forced prepends, so it can be
-  re-run after Homebrew or macOS `path_helper` reorder PATH) and sources
-  `~/.env` and `~/.env.local` with `set -a`.
-- `shared/os/darwin.*`, `zsh/os/darwin.zsh`: Homebrew, Tailscale app, gcloud.
-- `shared/os/arch.*`: `yay` wrapper.
-- `shared/hosts/<host>.*`, `zsh/hosts/<host>.zsh`: one machine.
-- `zsh/plugins.zsh`: zinit and plugins. `zsh/hooks.zsh`: fzf, zoxide, uv
-  completions, oh-my-posh.
+- True everywhere: `env.zsh` (PATH, exports), `rc.zsh` (aliases, options),
+  `hooks.zsh` (tool init). Guard on `command -v`, not on OS.
+- One OS or distro: `os/<tag>.<stage>.zsh`. One machine: `hosts/<host>.<stage>.zsh`.
 - `~/.env.local`: secrets, `KEY=value`. `~/.zshrc.local`: host-only zsh, loaded
   last; must start with `[[ -n ${_ZSHRC_LOCAL_FROM_DOTFILES-} ]] || return` so
   Arch's grml `/etc/zsh/zshrc`, which sources it early, does nothing. Both are
   in `.chezmoiignore`.
 - When an installer appends to `~/.zshrc` or `~/.zprofile`: move the lines
-  here (PATH → `shared/env.sh`, hooks → `zsh/hooks.zsh`, login-only →
-  `shared/os/<os>.profile.sh`, aliases → `shared/aliases.sh`) and restore the
-  one-line shim with `chezmoi apply`.
+  here (PATH → `env.zsh`, hooks → `hooks.zsh`, login-only →
+  `os/<os>.profile.zsh`, aliases → `rc.zsh`) and restore the one-line shim
+  with `chezmoi apply`.
 
 ## Toolchain (proto)
 

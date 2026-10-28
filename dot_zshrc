@@ -1,1 +1,1 @@
-. "$HOME/.local/shell/zsh/zshrc.sh"
+. "$HOME/.local/shell/rc.zsh"

@@ -1,4 +1,4 @@
-[ -r "$HOME/.local/shell/zsh/plugins.zsh" ] && . "$HOME/.local/shell/zsh/plugins.zsh"
+[ -r "$HOME/.local/shell/plugins.zsh" ] && . "$HOME/.local/shell/plugins.zsh"
 
 autoload -Uz compinit
 compinit

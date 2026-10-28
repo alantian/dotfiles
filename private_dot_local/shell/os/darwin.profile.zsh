@@ -7,7 +7,7 @@ fi
 
 # macOS /etc/zprofile runs path_helper *after* ~/.zshenv and rebuilds PATH with
 # the system dirs first. Put Homebrew back ahead of the system dirs, then our
-# own dirs ahead of Homebrew (user_path_setup comes from shared/env.sh).
+# own dirs ahead of Homebrew (user_path_setup comes from env.zsh).
 _hb="${HOMEBREW_PREFIX:-/opt/homebrew}"
 path_force_prepend "$_hb/sbin"
 path_force_prepend "$_hb/bin"
