@@ -105,11 +105,11 @@ install_system_pkgs() {
       ;;
     ubuntu)
       $SUDO apt-get update -y
-      $SUDO apt-get install -y git curl wget zsh ca-certificates xz-utils unzip vim tmux
+      $SUDO apt-get install -y git curl wget zsh ca-certificates xz-utils unzip less vim tmux
       ;;
     arch)
       # Full sync+upgrade first: a fresh image has a stale db and -S alone 404s.
-      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh unzip vim tmux
+      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh unzip less vim tmux
       ;;
   esac
 }

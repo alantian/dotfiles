@@ -8,7 +8,7 @@ Managed by [chezmoi](https://www.chezmoi.io/). zsh only.
 bash <(curl -fsSL https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh)
 ```
 
-Installs system packages (git, curl, wget, zsh, unzip, vim, tmux), makes zsh the
+Installs system packages (git, curl, wget, zsh, unzip, less, vim, tmux), makes zsh the
 login shell, applies the dotfiles, installs proto and the pinned toolchain from
 `~/.proto/.prototools`, then oh-my-posh, fzf, zoxide and zinit. Creates
 `~/.env.local` (secrets) and `~/.zshrc.local` (host-only zsh) if missing.
