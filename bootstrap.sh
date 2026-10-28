@@ -11,7 +11,7 @@ set -euo pipefail
 # Scope: only what the dotfiles themselves need (zsh, prompt, fzf, zoxide,
 # zinit, chezmoi) plus the proto toolchain. zsh is the only supported shell;
 # bootstrap aborts if zsh cannot be made the login shell. Applications (npm globals such as
-# gemini-cli/codex, uv tools, editors) are installed by hand afterwards.
+# gemini-cli/codex, editors) are installed by hand afterwards.
 
 # ---------------------------------------------------------------------------
 # Sudo helper

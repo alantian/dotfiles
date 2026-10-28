@@ -14,7 +14,7 @@ login shell, applies the dotfiles, installs proto and the pinned toolchain from
 `~/.env.local` (secrets) and `~/.zshrc.local` (host-only zsh) if missing.
 Safe to rerun. Needs sudo; a GitHub SSH key makes the clone pushable.
 
-Not installed: applications (npm CLIs, uv tools), fonts (the terminal needs a
+Not installed: applications (npm CLIs), fonts (the terminal needs a
 Nerd Font, e.g. MesloLGL Nerd Font Mono), desktop configs' programs.
 
 ## Daily use
