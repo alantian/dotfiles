@@ -1,0 +1,14 @@
+#!/bin/sh
+# Runs after `chezmoi apply` whenever ~/.proto/.prototools changed (hash below).
+# Installs the pinned versions on this host. No-op if proto is not installed yet
+# (bootstrap installs it and then runs the same command).
+# prototools hash: {{ include "dot_proto/dot_prototools" | sha256sum }}
+set -e
+PROTO="${PROTO_HOME:-$HOME/.proto}/bin/proto"
+if [ ! -x "$PROTO" ]; then
+  echo "proto not installed; skipping proto install (bootstrap does it)"
+  exit 0
+fi
+echo "==> .prototools changed: proto install --config-mode global"
+"$PROTO" install --config-mode global -y
+"$PROTO" regen

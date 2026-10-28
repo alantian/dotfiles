@@ -24,23 +24,35 @@ Installer wrote into `~/.zshrc`? Move the lines: PATH → `env.zsh`, hooks →
 
 ## proto
 
-Pins in `~/.proto/.prototools` (chezmoi-managed, same on every host). A pin is
-the default; other installed versions stay usable via a project `.prototools`,
-`PROTO_NODE_VERSION=x node`, or `uv run --python x`. `python3` is not shimmed.
+Pins: `~/.proto/.prototools` (chezmoi-managed, identical on every host). The pin
+is the default version; other installed versions coexist and are picked by a
+project `.prototools`, `PROTO_NODE_VERSION=x node` or `uv run --python x`.
+`python3` is not shimmed.
 
-Update a pin, on one host:
+Install a new version and pin it (on one host):
 
 ```
-proto outdated --config-mode global
-proto install node 26.13.0 --pin global
-chezmoi add ~/.proto/.prototools && chezmoi git push
+proto outdated --config-mode global        # what is newer
+proto install node 26.13.0 --pin global    # install + write the pin
+chezmoi add ~/.proto/.prototools           # auto-commits
+chezmoi git push
 ```
 
-Other hosts: pull, diff, apply, then `proto install --config-mode global`.
+Other hosts: `chezmoi git pull && chezmoi diff && chezmoi apply`. When the pin
+file changed, apply runs `proto install --config-mode global` by itself
+(`run_onchange_after_proto-install.sh.tmpl`), so the new version is installed
+before the next shell.
 
-Remove old: `proto uninstall node 26.12.0` (auto-clean is off: it would delete pinned versions unused for 30 days).
+Remove old versions (manual, repeat on each host):
+
+```
+proto versions node --installed   # what is installed
+proto uninstall node 26.12.0
+```
+
+auto-clean is off: it would delete pinned versions unused for 30 days.
 Never `proto clean --days 0` (deletes pinned versions and the pins).
-Node major bump: reinstall npm globals.
+Node major bump: reinstall the npm globals.
 
 npm globals (not dotfiles): `npm install -g @google/gemini-cli @openai/codex @earendil-works/pi-coding-agent`.
 thefuck: `uv tool install thefuck --python ~/.proto/shims/python`.
