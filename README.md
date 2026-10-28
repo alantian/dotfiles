@@ -31,4 +31,4 @@ chezmoi git push               # autoPush is off
 Pull, diff, apply rather than `chezmoi update`: whatever lands on `main` runs
 as you on every host, so look at it once before applying.
 
-Shell layout and toolchain rules: `~/.local/shell/README.md`.
+Shell layout and proto pins: [private_dot_local/shell/README.md](private_dot_local/shell/README.md) (applied as `~/.local/shell/README.md`).
