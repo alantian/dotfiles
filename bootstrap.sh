@@ -101,15 +101,15 @@ install_system_pkgs() {
       else
         echo "Homebrew already installed"
       fi
-      brew install git curl wget </dev/null
+      brew install git curl wget tmux </dev/null
       ;;
     ubuntu)
       $SUDO apt-get update -y
-      $SUDO apt-get install -y git curl wget zsh ca-certificates xz-utils
+      $SUDO apt-get install -y git curl wget zsh ca-certificates xz-utils unzip vim tmux
       ;;
     arch)
       # Full sync+upgrade first: a fresh image has a stale db and -S alone 404s.
-      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh
+      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh unzip vim tmux
       ;;
   esac
 }
