@@ -4,7 +4,7 @@ All shell config lives here. The files in `$HOME` (`.zshenv`, `.zprofile`,
 `.zshrc`) are one-line shims that source into it. zsh only; `/bin/sh` scripts
 are unaffected.
 
-Run `chezmoi update` before editing and `chezmoi git -- push` after.
+Run `chezmoi git pull`, `chezmoi diff`, `chezmoi apply` before editing and `chezmoi git -- push` after.
 
 ## Source order
 

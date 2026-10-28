@@ -20,10 +20,15 @@ Nerd Font, e.g. MesloLGL Nerd Font Mono), desktop configs' programs.
 ## Daily use
 
 ```bash
-chezmoi update                 # pull + apply; run before editing, several hosts push here
+chezmoi git pull               # several hosts push here; always first
+chezmoi diff                   # read what would change before it runs in every shell
+chezmoi apply
 chezmoi edit ~/.zshrc          # or edit the file, then: chezmoi add ~/.zshrc
 chezmoi apply
 chezmoi git push               # autoPush is off
 ```
+
+Pull, diff, apply rather than `chezmoi update`: whatever lands on `main` runs
+as you on every host, so look at it once before applying.
 
 Shell layout and toolchain rules: `~/.local/shell/README.md`.
