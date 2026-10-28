@@ -29,11 +29,14 @@ is the default version; other installed versions coexist and are picked by a
 project `.prototools`, `PROTO_NODE_VERSION=x node` or `uv run --python x`.
 `python3` is not shimmed.
 
-Install a new version and pin it (on one host):
+Versions below are examples and will be stale; find the current ones first.
+
+Install a new tool version and pin it (on one host):
 
 ```
-proto outdated --config-mode global        # what is newer
-proto install node 26.13.0 --pin global    # install + write the pin
+proto outdated --config-mode global        # newest version of each pinned tool
+proto versions node | tail                 # or: all versions of one tool
+proto install node <ver> --pin global      # install + write the pin
 chezmoi add ~/.proto/.prototools           # auto-commits
 chezmoi git push
 ```
@@ -41,8 +44,9 @@ chezmoi git push
 Update proto itself (on one host):
 
 ```
-proto upgrade 0.64.0                       # or `proto upgrade` for latest
-chezmoi edit ~/.proto/.prototools          # set proto = "0.64.0"; auto-commits
+proto upgrade                              # to latest; or: proto upgrade <ver>
+proto --version                            # the version to pin
+chezmoi edit ~/.proto/.prototools          # set proto = "<ver>"; auto-commits
 chezmoi git push
 ```
 
@@ -54,7 +58,7 @@ Remove old versions (manual, repeat on each host):
 
 ```
 proto versions node --installed   # what is installed
-proto uninstall node 26.12.0
+proto uninstall node <old-ver>
 ```
 
 auto-clean is off: it would delete pinned versions unused for 30 days.
