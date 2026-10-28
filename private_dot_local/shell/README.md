@@ -38,10 +38,17 @@ chezmoi add ~/.proto/.prototools           # auto-commits
 chezmoi git push
 ```
 
+Update proto itself (on one host):
+
+```
+proto upgrade 0.64.0                       # or `proto upgrade` for latest
+chezmoi edit ~/.proto/.prototools          # set proto = "0.64.0"; auto-commits
+chezmoi git push
+```
+
 Other hosts: `chezmoi git pull && chezmoi diff && chezmoi apply`. When the pin
-file changed, apply runs `proto install --config-mode global` by itself
-(`run_onchange_after_proto-install.sh.tmpl`), so the new version is installed
-before the next shell.
+file changed, apply runs `run_onchange_after_proto-install.sh.tmpl`: upgrades
+proto to its pin, then `proto install --config-mode global`, then `proto regen`.
 
 Remove old versions (manual, repeat on each host):
 
