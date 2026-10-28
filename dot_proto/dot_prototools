@@ -10,4 +10,4 @@ proto = "0.55.3"
 
 [settings]
 auto-install = true
-auto-clean = true
+auto-clean = false

@@ -38,7 +38,7 @@ chezmoi add ~/.proto/.prototools && chezmoi git push
 
 Other hosts: pull, diff, apply, then `proto install --config-mode global`.
 
-Remove old: `proto uninstall node 26.12.0` (auto-clean also drops versions unused 30 days).
+Remove old: `proto uninstall node 26.12.0` (auto-clean is off: it would delete pinned versions unused for 30 days).
 Never `proto clean --days 0` (deletes pinned versions and the pins).
 Node major bump: reinstall npm globals.
 
