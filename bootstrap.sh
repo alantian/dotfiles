@@ -12,6 +12,9 @@ set -euo pipefail
 # zinit, chezmoi) plus the proto toolchain. zsh is the only supported shell;
 # bootstrap aborts if zsh cannot be made the login shell. Applications (npm globals such as
 # gemini-cli/codex, editors) are installed by hand afterwards.
+# Side effects worth knowing: on Arch every run does `pacman -Syu` (full system
+# upgrade); applying the dotfiles deletes ~/.bashrc and ~/.bash_profile
+# (.chezmoiremove, zsh only); a rerun does a blind `chezmoi update`.
 
 # ---------------------------------------------------------------------------
 # Sudo helper
@@ -105,11 +108,11 @@ install_system_pkgs() {
       ;;
     ubuntu)
       $SUDO apt-get update -y
-      $SUDO apt-get install -y git curl wget zsh ca-certificates xz-utils unzip less vim tmux
+      $SUDO apt-get install -y git curl wget zsh openssh-client ca-certificates xz-utils unzip less vim tmux
       ;;
     arch)
       # Full sync+upgrade first: a fresh image has a stale db and -S alone 404s.
-      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh unzip less vim tmux
+      $SUDO pacman -Syu --needed --noconfirm git curl wget zsh openssh unzip less vim tmux
       ;;
   esac
 }
@@ -208,6 +211,11 @@ install_proto() {
 # ---------------------------------------------------------------------------
 # proto tools
 # ---------------------------------------------------------------------------
+# Extra, unpinned versions kept installed alongside the pins (the owner updates
+# this list by hand, like the pins). The global `python` stays the pinned 3.13;
+# a project can select 3.14 with its own .prototools or `uv run --python 3.14`.
+PROTO_EXTRA_VERSIONS=(python@3.14.8)
+
 install_proto_tools() {
   step "Installing proto tools pinned in ~/.proto/.prototools"
 
@@ -226,16 +234,12 @@ install_proto_tools() {
   echo "  proto install --config-mode global   # all tools from $PROTO_HOME/.prototools"
   "$proto" install --config-mode global -y
 
-  # Extra, unpinned versions kept installed alongside the pins (the owner updates
-  # this list by hand, like the pins). The global `python` stays the pinned 3.13;
-  # a project can select 3.14 with its own .prototools or `uv run --python 3.14`.
   local spec
   for spec in ${PROTO_EXTRA_VERSIONS[@]+"${PROTO_EXTRA_VERSIONS[@]}"}; do  # safe when empty on bash 3.2
     echo "  proto install ${spec%@*} ${spec#*@}"
     "$proto" install --config-mode global "${spec%@*}" "${spec#*@}" -y
   done
 }
-PROTO_EXTRA_VERSIONS=(python@3.14.8)
 
 # ---------------------------------------------------------------------------
 # proto shims

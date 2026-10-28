@@ -8,7 +8,7 @@ Managed by [chezmoi](https://www.chezmoi.io/). zsh only.
 bash <(curl -fsSL https://raw.githubusercontent.com/alantian/dotfiles/main/bootstrap.sh)
 ```
 
-Installs system packages (Linux: git, curl, wget, zsh, unzip, less, vim, tmux;
+Installs system packages (Linux: git, curl, wget, zsh, ssh client, unzip, less, vim, tmux;
 macOS: git, curl, wget, tmux via Homebrew), makes zsh the login shell, applies
 the dotfiles, installs proto, the pins in `~/.proto/.prototools` and
 `PROTO_EXTRA_VERSIONS` from bootstrap.sh (python 3.14), then oh-my-posh, fzf,
