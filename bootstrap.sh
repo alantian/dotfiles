@@ -342,22 +342,41 @@ install_chezmoi() {
 }
 
 # ---------------------------------------------------------------------------
-# ~/.env.local (host-local secrets; never in the dotfiles)
+# Host-local files that live outside the dotfiles: ~/.env.local (secrets) and
+# ~/.zshrc.local (host-only zsh). Created empty-with-a-header only when absent;
+# an existing file is never touched, so rerunning on a configured host is safe.
 # ---------------------------------------------------------------------------
-ensure_env_local() {
-  step "Ensuring ~/.env.local exists"
+ensure_local_files() {
+  step "Ensuring ~/.env.local and ~/.zshrc.local exist (never overwritten)"
+
   if [ -e "$HOME/.env.local" ]; then
-    echo "$HOME/.env.local present"
-    return
-  fi
-  umask 077
-  cat > "$HOME/.env.local" <<'EOT'
+    echo "$HOME/.env.local present, left as is"
+  else
+    umask 077
+    cat > "$HOME/.env.local" <<'EOT'
 # Host-local secrets and overrides, KEY=value, one per line. Sourced with
 # `set -a` by ~/.local/shell/shared/env.sh in every shell. Never committed
 # (it is in chezmoi's ignore list). Add API keys etc. here.
 EOT
-  umask 022
-  echo "created empty ~/.env.local (mode 600); add your API keys there"
+    umask 022
+    echo "created empty ~/.env.local (mode 600); add your API keys there"
+  fi
+
+  if [ -e "$HOME/.zshrc.local" ]; then
+    echo "$HOME/.zshrc.local present, left as is"
+  else
+    cat > "$HOME/.zshrc.local" <<'EOT'
+# Host-local zsh config, outside chezmoi (it is in the ignore list). Loaded
+# last by ~/.local/shell/zsh/zshrc.sh, after the shared/OS/host layers. The
+# guard below makes any other loader (e.g. Arch's grml /etc/zsh/zshrc, which
+# sources this file early) a no-op. Keep the file idempotent.
+[[ -n ${_ZSHRC_LOCAL_FROM_DOTFILES-} ]] || return
+[[ -n ${_ZSHRC_LOCAL_LOADED-} ]] && return
+_ZSHRC_LOCAL_LOADED=1
+
+EOT
+    echo "created ~/.zshrc.local with the loader guard; add host-only zsh config below it"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -381,7 +400,7 @@ main() {
   install_proto
   install_proto_tools
   regen_proto_shims
-  ensure_env_local
+  ensure_local_files
 
   # Interactive shell and terminal tooling.
   install_oh_my_posh
@@ -410,7 +429,7 @@ main() {
   echo "  python:     $("${PROTO_HOME}/shims/python" --version 2>/dev/null || echo 'NOT FOUND')"
   echo
   echo "Open a new terminal (or run: exec zsh) to pick up the new configuration."
-  echo "Then put your secrets in ~/.env.local."
+  echo "Then put your secrets in ~/.env.local and host-only zsh config in ~/.zshrc.local."
 }
 
 main "$@"

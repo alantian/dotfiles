@@ -11,14 +11,16 @@ bash <(curl -fsSL https://raw.githubusercontent.com/alantian/dotfiles/main/boots
 
 (Not `curl | bash`: steps that read stdin would swallow the script.) Needs curl
 and sudo; have a GitHub SSH key in place if the clone should be pushable.
-Rerunning is safe and idempotent. Afterwards, put secrets in `~/.env.local`.
+Rerunning is safe and idempotent. Afterwards, put secrets in `~/.env.local` and
+host-only zsh config in `~/.zshrc.local`.
 
 Bootstrap installs or updates core packages, ensures `zsh` is the default
 shell, applies the chezmoi-managed dotfiles (which carry the tool pins and the
 npm prefix), installs `proto` with `PROTO_HOME=~/.proto`, installs the pinned
 toolchain from `~/.proto/.prototools` (node, npm, pnpm, uv, python 3.13 as the
 default plus a 3.14 kept alongside; explicit versions, nothing floats, updated
-by hand), creates an empty `~/.env.local`, and then the zsh tooling
+by hand), creates `~/.env.local` and `~/.zshrc.local` if they are missing
+(existing ones are never overwritten), and then the zsh tooling
 (oh-my-posh, fzf, zoxide, zinit). Applications such as the npm AI CLIs
 are installed by hand afterwards; see `~/.local/shell/README.md`. Rerunning it
 is reproducible.
